@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Menu, X } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -10,11 +11,13 @@ import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { Logo } from "@/components/ui/logo";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
+import { SignOutButton } from "@/components/auth/github-sign-in-button";
 
 export function Navbar() {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   return (
     <header className="glass-header sticky top-0 z-40 border-b border-border/70">
@@ -47,12 +50,23 @@ export function Navbar() {
         <div className="hidden items-center gap-2 md:flex">
           <LanguageSwitcher compact />
           <ThemeSwitcher />
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/login">{t("login")}</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link href="/register">{t("signUp")}</Link>
-          </Button>
+          {status === "authenticated" && session?.user ? (
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/dashboard">{session.user.name || session.user.email}</Link>
+              </Button>
+              <SignOutButton />
+            </>
+          ) : (
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/login">{t("login")}</Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link href="/register">{t("signUp")}</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <Button
@@ -88,18 +102,29 @@ export function Navbar() {
           <div className="mt-4 flex flex-col gap-3 border-t border-border pt-4">
             <LanguageSwitcher />
             <ThemeSwitcher variant="select" />
-            <div className="grid grid-cols-2 gap-2">
-              <Button asChild variant="outline">
-                <Link href="/login" onClick={() => setOpen(false)}>
-                  {t("login")}
-                </Link>
-              </Button>
-              <Button asChild>
-                <Link href="/register" onClick={() => setOpen(false)}>
-                  {t("signUp")}
-                </Link>
-              </Button>
-            </div>
+            {status === "authenticated" && session?.user ? (
+              <div className="grid grid-cols-2 gap-2">
+                <Button asChild variant="outline">
+                  <Link href="/dashboard" onClick={() => setOpen(false)}>
+                    {session.user.name || "Dashboard"}
+                  </Link>
+                </Button>
+                <SignOutButton />
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                <Button asChild variant="outline">
+                  <Link href="/login" onClick={() => setOpen(false)}>
+                    {t("login")}
+                  </Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/register" onClick={() => setOpen(false)}>
+                    {t("signUp")}
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       ) : null}

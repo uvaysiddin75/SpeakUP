@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { auth } from "@/auth";
 import { gradeQuizAttempt } from "@/services/quiz-service";
 
 const bodySchema = z.object({
@@ -12,11 +13,11 @@ const bodySchema = z.object({
       timeSpentSec: z.number().int().nonnegative().optional(),
     }),
   ),
-  userId: z.string().optional(),
 });
 
 export async function POST(request: Request) {
   try {
+    const session = await auth();
     const json = await request.json();
     const parsed = bodySchema.safeParse(json);
     if (!parsed.success) {
@@ -26,7 +27,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await gradeQuizAttempt(parsed.data);
+    const result = await gradeQuizAttempt({
+      ...parsed.data,
+      userId: session?.user?.id,
+    });
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

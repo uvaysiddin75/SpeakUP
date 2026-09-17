@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { AuthSessionProvider } from "@/components/providers/auth-session-provider";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -72,9 +73,11 @@ export default async function LocaleLayout({
     <html lang={locale} className={`${sans.variable} ${display.variable}`} suppressHydrationWarning>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <ThemeProvider>
-          <NextIntlClientProvider messages={messages}>
-            {children}
-          </NextIntlClientProvider>
+          <AuthSessionProvider>
+            <NextIntlClientProvider messages={messages}>
+              {children}
+            </NextIntlClientProvider>
+          </AuthSessionProvider>
         </ThemeProvider>
       </body>
     </html>

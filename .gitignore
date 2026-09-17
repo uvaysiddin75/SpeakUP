@@ -58,3 +58,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel
+
+# local deploy helpers (never commit)
+.vercel-auth-secret.txt
+scripts/create-github-app.mjs
+
+
+seed-neon*.log
+.vercel-auth-secret.txt
+
