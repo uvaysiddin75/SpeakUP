@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { GitHubSignInButton } from "@/components/auth/github-sign-in-button";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 
 export default async function RegisterPage({
   params,
@@ -21,10 +21,10 @@ export default async function RegisterPage({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Create your SpeakUp account with GitHub in one click.
+          Create your SpeakUp account with Google in one click.
         </p>
-        <GitHubSignInButton
-          label={`${tNav("signUp")} with GitHub`}
+        <GoogleSignInButton
+          label={`${tNav("signUp")} with Google`}
           callbackUrl={`/${locale}/dashboard`}
         />
         <p className="text-center text-sm text-muted-foreground">

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { Logo } from "@/components/ui/logo";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
-import { SignOutButton } from "@/components/auth/github-sign-in-button";
+import { SignOutButton } from "@/components/auth/google-sign-in-button";
 
 export function Navbar() {
   const t = useTranslations("nav");

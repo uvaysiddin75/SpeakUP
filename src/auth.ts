@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
@@ -15,11 +16,32 @@ function slugUsername(login: string | null | undefined, email: string | null | u
 
 const adapter = PrismaAdapter(prisma);
 
+const providers = [
+  ...(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET
+    ? [
+        Google({
+          clientId: process.env.AUTH_GOOGLE_ID,
+          clientSecret: process.env.AUTH_GOOGLE_SECRET,
+          allowDangerousEmailAccountLinking: true,
+        }),
+      ]
+    : []),
+  ...(process.env.AUTH_GITHUB_ID && process.env.AUTH_GITHUB_SECRET
+    ? [
+        GitHub({
+          clientId: process.env.AUTH_GITHUB_ID,
+          clientSecret: process.env.AUTH_GITHUB_SECRET,
+          allowDangerousEmailAccountLinking: true,
+        }),
+      ]
+    : []),
+];
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: {
     ...adapter,
     async createUser(data) {
-      const email = data.email ?? `user_${Date.now()}@users.noreply.github.com`;
+      const email = data.email ?? `user_${Date.now()}@users.noreply.speakup.app`;
       let username = slugUsername(data.name, email);
       const existing = await prisma.user.findUnique({ where: { username } });
       if (existing) {
@@ -45,17 +67,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       });
     },
   },
-  providers: [
-    ...(process.env.AUTH_GITHUB_ID && process.env.AUTH_GITHUB_SECRET
-      ? [
-          GitHub({
-            clientId: process.env.AUTH_GITHUB_ID,
-            clientSecret: process.env.AUTH_GITHUB_SECRET,
-            allowDangerousEmailAccountLinking: true,
-          }),
-        ]
-      : []),
-  ],
+  providers,
   session: { strategy: "database" },
   pages: {
     signIn: "/en/login",

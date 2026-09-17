@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { GitHubSignInButton } from "@/components/auth/github-sign-in-button";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 
 export default async function LoginPage({
   params,
@@ -21,10 +21,10 @@ export default async function LoginPage({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Sign in with your GitHub account to save progress and solve lessons online.
+          Sign in with Google to save progress and solve lessons online.
         </p>
-        <GitHubSignInButton
-          label={`${tNav("login")} with GitHub`}
+        <GoogleSignInButton
+          label={`${tNav("login")} with Google`}
           callbackUrl={`/${locale}/dashboard`}
         />
         <p className="text-center text-sm text-muted-foreground">
