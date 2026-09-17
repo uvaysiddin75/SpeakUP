@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "title": "SpeakUp — Учите английский. Говорите уверенно.",
+    "description": "Улучшайте английский с интерактивными уроками, тестами, словарём и персональным прогрессом."
+  },
+  "common": {
+    "appName": "SpeakUp",
+    "loading": "Загрузка…",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "continue": "Продолжить",
+    "back": "Назад",
+    "search": "Поиск",
+    "comingSoon": "Этот раздел будет подключён на следующих этапах.",
+    "empty": "Пока здесь ничего нет.",
+    "foundationNote": "Этап Foundation — структура готова."
+  },
+  "nav": {
+    "home": "Главная",
+    "courses": "Курсы",
+    "grammar": "Грамматика",
+    "vocabulary": "Словарь",
+    "reading": "Чтение",
+    "listening": "Аудирование",
+    "writing": "Письмо",
+    "speaking": "Говорение",
+    "tests": "Тесты",
+    "progress": "Прогресс",
+    "dashboard": "Кабинет",
+    "profile": "Профиль",
+    "settings": "Настройки",
+    "login": "Вход",
+    "signUp": "Регистрация",
+    "logout": "Выход",
+    "admin": "Админ",
+    "search": "Поиск",
+    "searchPlaceholder": "Искать уроки, словарь, тесты…"
+  },
+  "home": {
+    "heroTitle": "Learn English. Speak with Confidence.",
+    "heroSubtitle": "Improve your English with interactive lessons, quizzes, vocabulary practice and personalized progress.",
+    "startLearning": "Начать обучение",
+    "exploreCourses": "Смотреть курсы",
+    "whyTitle": "Почему SpeakUp?",
+    "whySubtitle": "Полный путь от A1 до C2 по шести ключевым навыкам.",
+    "levelsTitle": "Выберите уровень",
+    "levelsSubtitle": "Структурированные курсы по шкале CEFR.",
+    "topics": "{count} тем",
+    "ctaTitle": "Готовы говорить уверенно?",
+    "ctaSubtitle": "Присоединяйтесь к SpeakUp и начните персональный путь в английском.",
+    "features": {
+      "grammar": { "title": "Grammar", "description": "Master English grammar." },
+      "vocabulary": { "title": "Vocabulary", "description": "Build a strong vocabulary." },
+      "reading": { "title": "Reading", "description": "Improve reading comprehension." },
+      "listening": { "title": "Listening", "description": "Train your listening skills." },
+      "writing": { "title": "Writing", "description": "Practice writing." },
+      "speaking": { "title": "Speaking", "description": "Build confidence in speaking." }
+    },
+    "levels": {
+      "A1": { "name": "Beginner", "description": "Start with basics: greetings, simple sentences, and everyday words." },
+      "A2": { "name": "Elementary", "description": "Build everyday communication for travel, shopping, and routines." },
+      "B1": { "name": "Intermediate", "description": "Express opinions, describe experiences, and handle most situations." },
+      "B2": { "name": "Upper-Intermediate", "description": "Discuss abstract topics and communicate fluently with native speakers." },
+      "C1": { "name": "Advanced", "description": "Use complex language flexibly for academic and professional goals." },
+      "C2": { "name": "Proficiency", "description": "Near-native mastery with precision, nuance, and stylistic control." }
+    }
+  },
+  "footer": {
+    "tagline": "Learn English. Speak with Confidence.",
+    "product": "Продукт",
+    "learn": "Обучение",
+    "account": "Аккаунт",
+    "rights": "© {year} SpeakUp. Все права защищены.",
+    "note": "Язык интерфейса не меняет учебный материал — вы всегда изучаете английский."
+  },
+  "pages": {
+    "courses": {
+      "title": "Курсы",
+      "subtitle": "Выберите уровень CEFR и изучайте темы."
+    },
+    "grammar": {
+      "title": "Грамматика",
+      "subtitle": "Объяснения, практика и тесты по темам."
+    },
+    "vocabulary": {
+      "title": "Словарь",
+      "subtitle": "Списки слов, карточки и практика."
+    },
+    "reading": {
+      "title": "Чтение",
+      "subtitle": "Тексты со словарём и вопросами."
+    },
+    "listening": {
+      "title": "Аудирование",
+      "subtitle": "Аудиоуроки с транскриптом и тестами."
+    },
+    "writing": {
+      "title": "Письмо",
+      "subtitle": "Задания с сохранением ответов."
+    },
+    "speaking": {
+      "title": "Говорение",
+      "subtitle": "Записывайте себя и развивайте уверенность."
+    },
+    "tests": {
+      "title": "Тесты",
+      "subtitle": "Квизы по темам и навыкам."
+    },
+    "progress": {
+      "title": "Прогресс",
+      "subtitle": "Баллы, серии и завершённые уроки."
+    },
+    "dashboard": {
+      "title": "Кабинет",
+      "subtitle": "Обзор обучения и следующие шаги."
+    },
+    "profile": {
+      "title": "Профиль",
+      "subtitle": "Аккаунт и статистика обучения."
+    },
+    "settings": {
+      "title": "Настройки",
+      "subtitle": "Язык, тема, уведомления и аккаунт."
+    },
+    "login": {
+      "title": "С возвращением",
+      "subtitle": "Войдите, чтобы продолжить обучение."
+    },
+    "register": {
+      "title": "Создайте аккаунт",
+      "subtitle": "Начните изучать английский с SpeakUp."
+    }
+  },
+  "theme": {
+    "label": "Тема",
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "system": "Системная"
+  },
+  "language": {
+    "label": "Язык",
+    "en": "English",
+    "ru": "Русский",
+    "uz": "O‘zbek"
+  },
+  "courses": {
+    "progress": "Прогресс",
+    "curriculum": "Программа",
+    "subtopicsCount": "{count} подтем",
+    "subtopicsInTopic": "{count} подтем",
+    "availableCount": "{count} доступно",
+    "subtopics": "Подтемы",
+    "lockedNote": "Завершите предыдущую подтему, чтобы открыть этот урок.",
+    "topicFinalTest": "Итоговый тест по теме",
+    "topicFinalTestNote": "Охватывает все подтемы этой темы.",
+    "categoryFinalTest": "Итоговый тест по разделу",
+    "categoryFinalTestNote": "Пройдите все темы перед этим тестом.",
+    "startTest": "Начать тест",
+    "backToTopic": "Назад к теме",
+    "explanation": "Объяснение",
+    "examples": "Примеры",
+    "vocabulary": "Словарь",
+    "tips": "Советы",
+    "practice": "Практика",
+    "practiceEmpty": "Упражнения появятся здесь, когда будут доступны.",
+    "backToLesson": "Назад к уроку",
+    "estimatedMin": "{count} мин"
+  }
+}

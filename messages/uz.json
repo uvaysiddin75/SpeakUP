@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "title": "SpeakUp — Ingliz tilini o‘rganing. Ishonch bilan gapiring.",
+    "description": "Interaktiv darslar, testlar, lug‘at va shaxsiy progress bilan ingliz tilingizni rivojlantiring."
+  },
+  "common": {
+    "appName": "SpeakUp",
+    "loading": "Yuklanmoqda…",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "continue": "Davom etish",
+    "back": "Orqaga",
+    "search": "Qidiruv",
+    "comingSoon": "Bu bo‘lim keyingi bosqichlarda ulanadi.",
+    "empty": "Hozircha bu yerda hech narsa yo‘q.",
+    "foundationNote": "Foundation bosqichi — tuzilma tayyor."
+  },
+  "nav": {
+    "home": "Bosh sahifa",
+    "courses": "Kurslar",
+    "grammar": "Grammatika",
+    "vocabulary": "Lug‘at",
+    "reading": "O‘qish",
+    "listening": "Tinglash",
+    "writing": "Yozish",
+    "speaking": "Gapirish",
+    "tests": "Testlar",
+    "progress": "Progress",
+    "dashboard": "Kabinet",
+    "profile": "Profil",
+    "settings": "Sozlamalar",
+    "login": "Kirish",
+    "signUp": "Ro‘yxatdan o‘tish",
+    "logout": "Chiqish",
+    "admin": "Admin",
+    "search": "Qidiruv",
+    "searchPlaceholder": "Darslar, lug‘at, testlarni qidirish…"
+  },
+  "home": {
+    "heroTitle": "Learn English. Speak with Confidence.",
+    "heroSubtitle": "Improve your English with interactive lessons, quizzes, vocabulary practice and personalized progress.",
+    "startLearning": "O‘rganishni boshlash",
+    "exploreCourses": "Kurslarni ko‘rish",
+    "whyTitle": "Nima uchun SpeakUp?",
+    "whySubtitle": "A1 dan C2 gacha olti asosiy ko‘nikma bo‘yicha to‘liq yo‘l.",
+    "levelsTitle": "Darajangizni tanlang",
+    "levelsSubtitle": "CEFR bo‘yicha tuzilgan kurslar.",
+    "topics": "{count} mavzu",
+    "ctaTitle": "Ishonch bilan gapirishga tayyormisiz?",
+    "ctaSubtitle": "SpeakUp’ga qo‘shiling va shaxsiy ingliz tili sayohatingizni boshlang.",
+    "features": {
+      "grammar": { "title": "Grammar", "description": "Master English grammar." },
+      "vocabulary": { "title": "Vocabulary", "description": "Build a strong vocabulary." },
+      "reading": { "title": "Reading", "description": "Improve reading comprehension." },
+      "listening": { "title": "Listening", "description": "Train your listening skills." },
+      "writing": { "title": "Writing", "description": "Practice writing." },
+      "speaking": { "title": "Speaking", "description": "Build confidence in speaking." }
+    },
+    "levels": {
+      "A1": { "name": "Beginner", "description": "Start with basics: greetings, simple sentences, and everyday words." },
+      "A2": { "name": "Elementary", "description": "Build everyday communication for travel, shopping, and routines." },
+      "B1": { "name": "Intermediate", "description": "Express opinions, describe experiences, and handle most situations." },
+      "B2": { "name": "Upper-Intermediate", "description": "Discuss abstract topics and communicate fluently with native speakers." },
+      "C1": { "name": "Advanced", "description": "Use complex language flexibly for academic and professional goals." },
+      "C2": { "name": "Proficiency", "description": "Near-native mastery with precision, nuance, and stylistic control." }
+    }
+  },
+  "footer": {
+    "tagline": "Learn English. Speak with Confidence.",
+    "product": "Mahsulot",
+    "learn": "O‘rganish",
+    "account": "Hisob",
+    "rights": "© {year} SpeakUp. Barcha huquqlar himoyalangan.",
+    "note": "Interfeys tili dars mazmunini o‘zgartirmaydi — siz doimo ingliz tilini o‘rganasiz."
+  },
+  "pages": {
+    "courses": {
+      "title": "Kurslar",
+      "subtitle": "CEFR darajasini tanlang va mavzularni o‘rganing."
+    },
+    "grammar": {
+      "title": "Grammatika",
+      "subtitle": "Tushuntirishlar, mashqlar va testlar."
+    },
+    "vocabulary": {
+      "title": "Lug‘at",
+      "subtitle": "So‘zlar, flashcardlar va mashq."
+    },
+    "reading": {
+      "title": "O‘qish",
+      "subtitle": "Matnlar, lug‘at va savollar."
+    },
+    "listening": {
+      "title": "Tinglash",
+      "subtitle": "Audio darslar, transcript va testlar."
+    },
+    "writing": {
+      "title": "Yozish",
+      "subtitle": "Yozma topshiriqlar va saqlangan javoblar."
+    },
+    "speaking": {
+      "title": "Gapirish",
+      "subtitle": "Ovoz yozib, ishonchni oshiring."
+    },
+    "tests": {
+      "title": "Testlar",
+      "subtitle": "Mavzu va ko‘nikma testlari."
+    },
+    "progress": {
+      "title": "Progress",
+      "subtitle": "Ballar, streak va tugallangan darslar."
+    },
+    "dashboard": {
+      "title": "Kabinet",
+      "subtitle": "O‘rganish ko‘rinishi va keyingi qadamlar."
+    },
+    "profile": {
+      "title": "Profil",
+      "subtitle": "Hisob va o‘rganish statistikasi."
+    },
+    "settings": {
+      "title": "Sozlamalar",
+      "subtitle": "Til, tema, bildirishnomalar va hisob."
+    },
+    "login": {
+      "title": "Xush kelibsiz",
+      "subtitle": "Davom etish uchun tizimga kiring."
+    },
+    "register": {
+      "title": "Hisob yarating",
+      "subtitle": "SpeakUp bilan ingliz tilini o‘rganishni boshlang."
+    }
+  },
+  "theme": {
+    "label": "Tema",
+    "light": "Yorug‘",
+    "dark": "Qorong‘u",
+    "system": "Tizim"
+  },
+  "language": {
+    "label": "Til",
+    "en": "English",
+    "ru": "Русский",
+    "uz": "O‘zbek"
+  },
+  "courses": {
+    "progress": "Progress",
+    "curriculum": "Dastur",
+    "subtopicsCount": "{count} submavzu",
+    "subtopicsInTopic": "{count} submavzu",
+    "availableCount": "{count} ochiq",
+    "subtopics": "Submavzular",
+    "lockedNote": "Bu darsni ochish uchun oldingi submavzuni tugating.",
+    "topicFinalTest": "Mavzu yakuniy testi",
+    "topicFinalTestNote": "Ushbu mavzudagi barcha submavzularni qamrab oladi.",
+    "categoryFinalTest": "Bo‘lim yakuniy testi",
+    "categoryFinalTestNote": "Ushbu testdan oldin barcha mavzularni tugating.",
+    "startTest": "Testni boshlash",
+    "backToTopic": "Mavzuga qaytish",
+    "explanation": "Tushuntirish",
+    "examples": "Misollar",
+    "vocabulary": "Lug‘at",
+    "tips": "Maslahatlar",
+    "practice": "Amaliyot",
+    "practiceEmpty": "Mashqlar mavjud bo‘lganda shu yerda ko‘rinadi.",
+    "backToLesson": "Darsga qaytish",
+    "estimatedMin": "{count} daqiqa"
+  }
+}

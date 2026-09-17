@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "title": "SpeakUp — Learn English. Speak with Confidence.",
+    "description": "Improve your English with interactive lessons, quizzes, vocabulary practice and personalized progress."
+  },
+  "common": {
+    "appName": "SpeakUp",
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "back": "Back",
+    "search": "Search",
+    "comingSoon": "This section will be connected in the next stages.",
+    "empty": "Nothing here yet.",
+    "foundationNote": "Foundation stage — structure is ready."
+  },
+  "nav": {
+    "home": "Home",
+    "courses": "Courses",
+    "grammar": "Grammar",
+    "vocabulary": "Vocabulary",
+    "reading": "Reading",
+    "listening": "Listening",
+    "writing": "Writing",
+    "speaking": "Speaking",
+    "tests": "Tests",
+    "progress": "Progress",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "logout": "Logout",
+    "admin": "Admin",
+    "search": "Search",
+    "searchPlaceholder": "Search lessons, vocabulary, tests…"
+  },
+  "home": {
+    "heroTitle": "Learn English. Speak with Confidence.",
+    "heroSubtitle": "Improve your English with interactive lessons, quizzes, vocabulary practice and personalized progress.",
+    "startLearning": "Start Learning",
+    "exploreCourses": "Explore Courses",
+    "whyTitle": "Why SpeakUp?",
+    "whySubtitle": "A complete path from A1 to C2 across the six core skills.",
+    "levelsTitle": "Choose your level",
+    "levelsSubtitle": "Structured courses mapped to the CEFR framework.",
+    "topics": "{count} topics",
+    "ctaTitle": "Ready to speak with confidence?",
+    "ctaSubtitle": "Join SpeakUp and start your personalized English journey today.",
+    "features": {
+      "grammar": { "title": "Grammar", "description": "Master English grammar." },
+      "vocabulary": { "title": "Vocabulary", "description": "Build a strong vocabulary." },
+      "reading": { "title": "Reading", "description": "Improve reading comprehension." },
+      "listening": { "title": "Listening", "description": "Train your listening skills." },
+      "writing": { "title": "Writing", "description": "Practice writing." },
+      "speaking": { "title": "Speaking", "description": "Build confidence in speaking." }
+    },
+    "levels": {
+      "A1": { "name": "Beginner", "description": "Start with basics: greetings, simple sentences, and everyday words." },
+      "A2": { "name": "Elementary", "description": "Build everyday communication for travel, shopping, and routines." },
+      "B1": { "name": "Intermediate", "description": "Express opinions, describe experiences, and handle most situations." },
+      "B2": { "name": "Upper-Intermediate", "description": "Discuss abstract topics and communicate fluently with native speakers." },
+      "C1": { "name": "Advanced", "description": "Use complex language flexibly for academic and professional goals." },
+      "C2": { "name": "Proficiency", "description": "Near-native mastery with precision, nuance, and stylistic control." }
+    }
+  },
+  "footer": {
+    "tagline": "Learn English. Speak with Confidence.",
+    "product": "Product",
+    "learn": "Learn",
+    "account": "Account",
+    "rights": "© {year} SpeakUp. All rights reserved.",
+    "note": "Interface language does not change lesson content — you always study English."
+  },
+  "pages": {
+    "courses": {
+      "title": "Courses",
+      "subtitle": "Pick a CEFR level and explore structured topics."
+    },
+    "grammar": {
+      "title": "Grammar",
+      "subtitle": "Explanations, practice, and topic tests."
+    },
+    "vocabulary": {
+      "title": "Vocabulary",
+      "subtitle": "Word lists, flashcards, and spaced practice."
+    },
+    "reading": {
+      "title": "Reading",
+      "subtitle": "Texts with vocabulary and comprehension questions."
+    },
+    "listening": {
+      "title": "Listening",
+      "subtitle": "Audio lessons with transcripts and quizzes."
+    },
+    "writing": {
+      "title": "Writing",
+      "subtitle": "Guided writing tasks with saved submissions."
+    },
+    "speaking": {
+      "title": "Speaking",
+      "subtitle": "Record yourself and build speaking confidence."
+    },
+    "tests": {
+      "title": "Tests",
+      "subtitle": "Topic quizzes and skill assessments."
+    },
+    "progress": {
+      "title": "Progress",
+      "subtitle": "Track scores, streaks, and completed lessons."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Your learning overview and next steps."
+    },
+    "profile": {
+      "title": "Profile",
+      "subtitle": "Your account and learning stats."
+    },
+    "settings": {
+      "title": "Settings",
+      "subtitle": "Language, theme, notifications, and account."
+    },
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to continue learning."
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Start learning English with SpeakUp."
+    }
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "ru": "Русский",
+    "uz": "O‘zbek"
+  },
+  "courses": {
+    "progress": "Progress",
+    "curriculum": "Curriculum",
+    "subtopicsCount": "{count} subtopics",
+    "subtopicsInTopic": "{count} subtopics",
+    "availableCount": "{count} available",
+    "subtopics": "Subtopics",
+    "lockedNote": "Complete the previous subtopic to unlock this lesson.",
+    "topicFinalTest": "Final Topic Test",
+    "topicFinalTestNote": "Covers all subtopics in this topic.",
+    "categoryFinalTest": "Category Final Test",
+    "categoryFinalTestNote": "Complete all topics before taking this test.",
+    "startTest": "Start Test",
+    "backToTopic": "Back to topic",
+    "explanation": "Explanation",
+    "examples": "Examples",
+    "vocabulary": "Vocabulary",
+    "tips": "Tips",
+    "practice": "Practice",
+    "practiceEmpty": "Practice items will appear here when available.",
+    "backToLesson": "Back to lesson",
+    "estimatedMin": "{count} min"
+  }
+}

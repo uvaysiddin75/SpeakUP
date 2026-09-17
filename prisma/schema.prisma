@@ -1,0 +1,791 @@
+// SpeakUp curriculum hierarchy
+// Level → Category → Topic → Subtopic → Lesson / Practice / Quiz → Questions
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum CefrCode {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+enum CategoryType {
+  GRAMMAR
+  VOCABULARY
+  READING
+  LISTENING
+  WRITING
+  SPEAKING
+}
+
+enum ProgressStatus {
+  LOCKED
+  AVAILABLE
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum TopicStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum QuizType {
+  SUBTOPIC
+  TOPIC_FINAL
+  CATEGORY_FINAL
+  LEVEL_FINAL
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  FILL_BLANK
+  CHOOSE_WORD
+  ARRANGE_WORDS
+  MATCH_WORDS
+  SENTENCE_CORRECTION
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum WritingFeedbackStatus {
+  PENDING
+  REVIEWED
+  AI_PENDING
+  AI_REVIEWED
+}
+
+enum SpeakingExerciseType {
+  READ_ALOUD
+  REPEAT_AFTER
+  ANSWER_QUESTION
+  DESCRIBE_PICTURE
+  TALK_TOPIC
+  GIVE_OPINION
+  ROLE_PLAY
+  DEBATE
+}
+
+enum EvaluationType {
+  SELF
+  AI
+  TEACHER
+}
+
+// ─── Auth / settings ─────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  avatarUrl    String?
+  currentLevel CefrCode @default(A1)
+  streak       Int      @default(0)
+  lastActiveAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  settings            UserSettings?
+  quizAttempts        QuizAttempt[]
+  subtopicProgress    SubtopicProgress[]
+  topicProgress       TopicProgress[]
+  categoryProgress    CategoryProgress[]
+  levelProgress       LevelProgress[]
+  userVocabulary             UserVocabulary[]
+  writingSubmissions         WritingSubmission[]
+  speakingSubmissions        SpeakingSubmission[]
+  activityDays               ActivityDay[]
+  vocabularyTopicProgress    VocabularyTopicProgress[]
+  readingProgress            ReadingProgress[]
+  listeningProgress          ListeningProgress[]
+  speakingProgress           SpeakingProgress[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model UserSettings {
+  id                 String  @id @default(cuid())
+  userId             String  @unique
+  language           String  @default("en")
+  theme              String  @default("system")
+  notificationsEmail Boolean @default(true)
+  notificationsPush  Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ActivityDay {
+  id     String   @id @default(cuid())
+  userId String
+  date   DateTime @db.Date
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+}
+
+// ─── Curriculum tree ─────────────────────────────────────────────────────────
+
+model Level {
+  id          String   @id @default(cuid())
+  code        CefrCode @unique
+  slug        String   @unique
+  name        String
+  description String
+  order       Int      @unique
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categories Category[]
+  quizzes    Quiz[]           @relation("LevelQuizzes")
+  progress   LevelProgress[]
+}
+
+model Category {
+  id          String       @id @default(cuid())
+  levelId     String
+  type        CategoryType
+  slug        String
+  name        String
+  description String
+  order       Int
+  isPublished Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  level    Level              @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  topics   Topic[]
+  quizzes  Quiz[]             @relation("CategoryQuizzes")
+  progress CategoryProgress[]
+
+  @@unique([levelId, type])
+  @@unique([levelId, slug])
+  @@index([levelId, order])
+}
+
+model Topic {
+  id           String   @id @default(cuid())
+  categoryId   String
+  slug         String
+  title        String
+  description  String
+  order        Int
+  difficulty   Difficulty @default(EASY)
+  isPublished  Boolean  @default(true)
+  isRequired   Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  category  Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subtopics Subtopic[]
+  quizzes   Quiz[]          @relation("TopicQuizzes")
+  progress  TopicProgress[]
+
+  @@unique([categoryId, slug])
+  @@index([categoryId, order])
+}
+
+model Subtopic {
+  id          String   @id @default(cuid())
+  topicId     String
+  slug        String
+  title       String
+  description String
+  order       Int
+  isPublished Boolean  @default(true)
+  isRequired  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  topic      Topic              @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  lesson     Lesson?
+  practice   Practice?
+  quizzes    Quiz[]             @relation("SubtopicQuizzes")
+  questions  Question[]
+  progress   SubtopicProgress[]
+
+  @@unique([topicId, slug])
+  @@index([topicId, order])
+}
+
+model Lesson {
+  id           String   @id @default(cuid())
+  subtopicId   String   @unique
+  explanation  String
+  examples     Json
+  vocabulary   Json?
+  tips         String?
+  estimatedMin Int      @default(10)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  subtopic Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+}
+
+model Practice {
+  id         String   @id @default(cuid())
+  subtopicId String   @unique
+  title      String
+  instructions String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  subtopic Subtopic       @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  items    PracticeItem[]
+}
+
+model PracticeItem {
+  id          String       @id @default(cuid())
+  practiceId  String
+  type        QuestionType
+  prompt      String
+  options     Json?
+  correctAnswer Json
+  explanation String?
+  order       Int          @default(0)
+
+  practice Practice @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+
+  @@index([practiceId, order])
+}
+
+// ─── Quiz system ─────────────────────────────────────────────────────────────
+
+model Quiz {
+  id              String   @id @default(cuid())
+  type            QuizType
+  title           String
+  description     String?
+  questionCount   Int
+  passScore       Int      @default(70)
+  timeLimitSec    Int?
+  isPublished     Boolean  @default(true)
+  levelId         String?
+  categoryId      String?
+  topicId         String?
+  subtopicId      String?
+  vocabularyTopicId String? @unique
+  readingTextId     String? @unique
+  listeningTaskId   String? @unique
+  speakingTaskId    String? @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  level           Level?           @relation("LevelQuizzes", fields: [levelId], references: [id], onDelete: Cascade)
+  category        Category?        @relation("CategoryQuizzes", fields: [categoryId], references: [id], onDelete: Cascade)
+  topic           Topic?           @relation("TopicQuizzes", fields: [topicId], references: [id], onDelete: Cascade)
+  subtopic        Subtopic?        @relation("SubtopicQuizzes", fields: [subtopicId], references: [id], onDelete: Cascade)
+  vocabularyTopic VocabularyTopic? @relation(fields: [vocabularyTopicId], references: [id], onDelete: Cascade)
+  readingText     ReadingText?     @relation(fields: [readingTextId], references: [id], onDelete: Cascade)
+  listeningTask   ListeningTask?   @relation(fields: [listeningTaskId], references: [id], onDelete: Cascade)
+  speakingTask    SpeakingTask?    @relation(fields: [speakingTaskId], references: [id], onDelete: Cascade)
+  questions       QuizQuestion[]
+  attempts        QuizAttempt[]
+
+  @@index([type])
+  @@index([levelId])
+  @@index([categoryId])
+  @@index([topicId])
+  @@index([subtopicId])
+}
+
+model Question {
+  id            String       @id @default(cuid())
+  subtopicId    String?
+  type          QuestionType
+  prompt        String
+  options       Json?
+  correctAnswer Json
+  explanation   String?
+  difficulty    Difficulty   @default(EASY)
+  tags          String[]     @default([])
+  isPublished   Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  subtopic Subtopic?      @relation(fields: [subtopicId], references: [id], onDelete: SetNull)
+  quizzes  QuizQuestion[]
+  answers  Answer[]
+
+  @@index([subtopicId])
+  @@index([type])
+  @@index([difficulty])
+}
+
+model QuizQuestion {
+  id         String @id @default(cuid())
+  quizId     String
+  questionId String
+  order      Int    @default(0)
+
+  quiz     Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([quizId, questionId])
+  @@index([quizId, order])
+}
+
+model QuizAttempt {
+  id             String   @id @default(cuid())
+  userId         String
+  quizId         String
+  score          Int
+  correctAnswers Int
+  wrongAnswers   Int
+  percentage     Float
+  timeSpentSec   Int
+  passed         Boolean
+  startedAt      DateTime @default(now())
+  completedAt    DateTime @default(now())
+
+  // denormalized scope for analytics / filtering
+  levelId    String?
+  categoryId String?
+  topicId    String?
+  subtopicId String?
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz    Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@index([userId, quizId])
+  @@index([userId, completedAt])
+  @@index([quizId])
+  @@index([levelId])
+  @@index([categoryId])
+  @@index([topicId])
+  @@index([subtopicId])
+}
+
+model Answer {
+  id            String   @id @default(cuid())
+  attemptId     String
+  questionId    String
+  userAnswer    Json
+  isCorrect     Boolean
+  timeSpentSec  Int?
+  createdAt     DateTime @default(now())
+
+  attempt  QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId])
+  @@index([questionId])
+}
+
+// ─── Progress ────────────────────────────────────────────────────────────────
+
+model LevelProgress {
+  id               String         @id @default(cuid())
+  userId           String
+  levelId          String
+  status           ProgressStatus @default(LOCKED)
+  percent          Float          @default(0)
+  categoriesDone   Int            @default(0)
+  categoriesTotal  Int            @default(0)
+  finalPassed      Boolean        @default(false)
+  bestFinalScore   Float?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  updatedAt        DateTime       @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level Level @relation(fields: [levelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, levelId])
+  @@index([userId])
+}
+
+model CategoryProgress {
+  id            String         @id @default(cuid())
+  userId        String
+  categoryId    String
+  status        ProgressStatus @default(LOCKED)
+  percent       Float          @default(0)
+  topicsDone    Int            @default(0)
+  topicsTotal   Int            @default(0)
+  finalPassed   Boolean        @default(false)
+  bestFinalScore Float?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  updatedAt     DateTime       @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categoryId])
+  @@index([userId])
+}
+
+model TopicProgress {
+  id              String      @id @default(cuid())
+  userId          String
+  topicId         String
+  status          TopicStatus @default(NOT_STARTED)
+  percent         Float       @default(0)
+  subtopicsDone   Int         @default(0)
+  subtopicsTotal  Int         @default(0)
+  finalPassed     Boolean     @default(false)
+  bestFinalScore  Float?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  updatedAt       DateTime    @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+  @@index([userId])
+}
+
+model SubtopicProgress {
+  id             String         @id @default(cuid())
+  userId         String
+  subtopicId     String
+  status         ProgressStatus @default(LOCKED)
+  lessonDone     Boolean        @default(false)
+  practiceDone   Boolean        @default(false)
+  bestScore      Float?
+  attemptsCount  Int            @default(0)
+  startedAt      DateTime?
+  completedAt    DateTime?
+  updatedAt      DateTime       @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subtopic Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subtopicId])
+  @@index([userId])
+}
+
+// ─── Skill content ───────────────────────────────────────────────────────────
+
+model VocabularyTopic {
+  id          String     @id @default(cuid())
+  levelCode   CefrCode
+  slug        String
+  title       String
+  description String
+  difficulty  Difficulty @default(EASY)
+  order       Int        @default(0)
+  isPublished Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  words    VocabularyWord[]
+  progress VocabularyTopicProgress[]
+  quiz     Quiz?
+
+  @@unique([levelCode, slug])
+  @@index([levelCode, order])
+}
+
+model VocabularyWord {
+  id            String     @id @default(cuid())
+  topicId       String?
+  levelCode     CefrCode?
+  categorySlug  String?
+  word          String
+  translationRu String
+  translationUz String
+  pronunciation String?
+  example       String?
+  partOfSpeech  String?
+  description   String?
+  difficulty    Difficulty @default(EASY)
+  audioUrl      String?
+  order         Int        @default(0)
+  tags          String[]   @default([])
+  isPublished   Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  topic          VocabularyTopic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  userVocabulary UserVocabulary[]
+
+  @@index([word])
+  @@index([topicId, order])
+  @@index([levelCode, categorySlug])
+}
+
+model UserVocabulary {
+  id           String    @id @default(cuid())
+  userId       String
+  wordId       String
+  known        Boolean   @default(false)
+  favorite     Boolean   @default(false)
+  reviewCount  Int       @default(0)
+  lastReviewAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word VocabularyWord @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wordId])
+  @@index([userId])
+}
+
+model VocabularyTopicProgress {
+  id            String         @id @default(cuid())
+  userId        String
+  topicId       String
+  status        ProgressStatus @default(AVAILABLE)
+  wordsLearned  Int            @default(0)
+  wordsTotal    Int            @default(0)
+  bestScore     Float?
+  attemptsCount Int            @default(0)
+  timeSpentSec  Int            @default(0)
+  completedAt   DateTime?
+  updatedAt     DateTime       @updatedAt
+
+  user  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic VocabularyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+  @@index([userId])
+}
+
+model ReadingText {
+  id             String     @id @default(cuid())
+  levelCode      CefrCode
+  slug           String
+  title          String
+  description    String?
+  text           String
+  vocabulary     Json?
+  importantWords Json?
+  difficulty     Difficulty @default(EASY)
+  order          Int        @default(0)
+  estimatedMin   Int        @default(10)
+  isPublished    Boolean    @default(true)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  questions ReadingQuestion[]
+  progress  ReadingProgress[]
+  quiz      Quiz?
+
+  @@unique([levelCode, slug])
+  @@index([levelCode, order])
+}
+
+model ReadingQuestion {
+  id            String       @id @default(cuid())
+  readingId     String
+  type          QuestionType @default(MULTIPLE_CHOICE)
+  prompt        String
+  options       Json?
+  correctAnswer Json
+  explanation   String?
+  order         Int          @default(0)
+
+  reading ReadingText @relation(fields: [readingId], references: [id], onDelete: Cascade)
+
+  @@index([readingId, order])
+}
+
+model ReadingProgress {
+  id            String         @id @default(cuid())
+  userId        String
+  readingId     String
+  status        ProgressStatus @default(AVAILABLE)
+  bestScore     Float?
+  attemptsCount Int            @default(0)
+  timeSpentSec  Int            @default(0)
+  completedAt   DateTime?
+  updatedAt     DateTime       @updatedAt
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reading ReadingText @relation(fields: [readingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, readingId])
+  @@index([userId])
+}
+
+model ListeningTask {
+  id           String     @id @default(cuid())
+  levelCode    CefrCode
+  slug         String
+  title        String
+  description  String?
+  audioUrl     String?
+  transcript   String?
+  vocabulary   Json?
+  difficulty   Difficulty @default(EASY)
+  order        Int        @default(0)
+  durationSec  Int?
+  isPublished  Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  questions ListeningQuestion[]
+  progress  ListeningProgress[]
+  quiz      Quiz?
+
+  @@unique([levelCode, slug])
+  @@index([levelCode, order])
+}
+
+model ListeningQuestion {
+  id            String       @id @default(cuid())
+  listeningId   String
+  type          QuestionType @default(MULTIPLE_CHOICE)
+  prompt        String
+  options       Json?
+  correctAnswer Json
+  explanation   String?
+  order         Int          @default(0)
+
+  listening ListeningTask @relation(fields: [listeningId], references: [id], onDelete: Cascade)
+
+  @@index([listeningId, order])
+}
+
+model ListeningProgress {
+  id            String         @id @default(cuid())
+  userId        String
+  listeningId   String
+  status        ProgressStatus @default(AVAILABLE)
+  bestScore     Float?
+  attemptsCount Int            @default(0)
+  timeSpentSec  Int            @default(0)
+  completedAt   DateTime?
+  updatedAt     DateTime       @updatedAt
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listening ListeningTask @relation(fields: [listeningId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listeningId])
+  @@index([userId])
+}
+
+model WritingTask {
+  id          String   @id @default(cuid())
+  levelCode   CefrCode
+  slug        String
+  title       String
+  prompt      String
+  minWords    Int      @default(40)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  submissions WritingSubmission[]
+
+  @@unique([levelCode, slug])
+}
+
+model WritingSubmission {
+  id             String                @id @default(cuid())
+  userId         String
+  taskId         String
+  content        String
+  wordCount      Int
+  charCount      Int
+  feedbackStatus WritingFeedbackStatus @default(PENDING)
+  aiFeedback     String?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task WritingTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([userId, taskId])
+}
+
+model SpeakingTask {
+  id                String               @id @default(cuid())
+  levelCode         CefrCode
+  slug              String
+  title             String
+  prompt            String
+  instructions      String?
+  usefulVocabulary  Json?
+  usefulPhrases     Json?
+  exampleAnswer     String?
+  exerciseType      SpeakingExerciseType @default(TALK_TOPIC)
+  timerSec          Int                  @default(120)
+  tips              String?
+  difficulty        Difficulty           @default(EASY)
+  order             Int                  @default(0)
+  isPublished       Boolean              @default(true)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  submissions SpeakingSubmission[]
+  progress    SpeakingProgress[]
+  quiz        Quiz?
+
+  @@unique([levelCode, slug])
+  @@index([levelCode, order])
+}
+
+model SpeakingSubmission {
+  id                 String         @id @default(cuid())
+  userId             String
+  taskId             String
+  audioUrl           String?
+  durationSec        Int?
+  evaluationType     EvaluationType @default(SELF)
+  pronunciationScore Int?
+  fluencyScore       Int?
+  grammarScore       Int?
+  vocabularyScore    Int?
+  confidenceScore    Int?
+  totalScore         Float?
+  notes              String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task SpeakingTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([userId, taskId])
+}
+
+model SpeakingProgress {
+  id            String         @id @default(cuid())
+  userId        String
+  taskId        String
+  status        ProgressStatus @default(AVAILABLE)
+  bestScore     Float?
+  attemptsCount Int            @default(0)
+  timeSpentSec  Int            @default(0)
+  completedAt   DateTime?
+  updatedAt     DateTime       @updatedAt
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task SpeakingTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, taskId])
+  @@index([userId])
+}
