@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
+import { SoundSettingsPanel } from "@/components/settings/sound-settings-panel";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function SettingsPage({
@@ -13,7 +14,7 @@ export default async function SettingsPage({
   const t = await getTranslations("pages.settings");
   const tTheme = await getTranslations("theme");
   const tLang = await getTranslations("language");
-  const tCommon = await getTranslations("common");
+  const tSound = await getTranslations("sound");
 
   return (
     <div className="space-y-6">
@@ -26,7 +27,7 @@ export default async function SettingsPage({
         <Card>
           <CardHeader>
             <CardTitle>{tLang("label")}</CardTitle>
-            <CardDescription>{tCommon("foundationNote")}</CardDescription>
+            <CardDescription>{t("languageHint")}</CardDescription>
           </CardHeader>
           <CardContent>
             <LanguageSwitcher />
@@ -40,6 +41,16 @@ export default async function SettingsPage({
           </CardHeader>
           <CardContent>
             <ThemeSwitcher variant="select" />
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>{tSound("title")}</CardTitle>
+            <CardDescription>{tSound("subtitle")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SoundSettingsPanel />
           </CardContent>
         </Card>
       </div>

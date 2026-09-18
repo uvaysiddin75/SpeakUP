@@ -130,10 +130,12 @@ function buildLevelTreeFromStatic(levelSlug: string): CurriculumLevelTree | null
 
 async function buildLevelTreeFromDb(
   levelSlug: string,
+  userId?: string,
 ): Promise<CurriculumLevelTree | null> {
   const level = await prisma.level.findUnique({
     where: { slug: levelSlug, isPublished: true },
     include: {
+      progress: userId ? { where: { userId }, take: 1 } : false,
       categories: {
         where: { isPublished: true },
         orderBy: { order: "asc" },
@@ -142,10 +144,12 @@ async function buildLevelTreeFromDb(
             where: { isPublished: true },
             orderBy: { order: "asc" },
             include: {
+              progress: userId ? { where: { userId }, take: 1 } : false,
               subtopics: {
                 where: { isPublished: true },
                 orderBy: { order: "asc" },
                 include: {
+                  progress: userId ? { where: { userId }, take: 1 } : false,
                   quizzes: {
                     where: { type: QuizType.SUBTOPIC, isPublished: true },
                     take: 1,
@@ -166,6 +170,102 @@ async function buildLevelTreeFromDb(
   });
 
   if (!level) return null;
+
+  // Ensure unlock state for authenticated users (first visit seeds AVAILABLE)
+  if (userId) {
+    const { ensureTopicUnlockState } = await import("@/services/progress-service");
+    for (const category of level.categories) {
+      for (const topic of category.topics) {
+        await ensureTopicUnlockState(userId, topic.id);
+      }
+    }
+    // Reload progress after unlock
+    return buildLevelTreeFromDb(levelSlug, undefined).then(async (tree) => {
+      // Re-fetch with user progress (avoid infinite loop by not calling ensure again)
+      const refreshed = await prisma.level.findUnique({
+        where: { id: level.id },
+        include: {
+          progress: { where: { userId }, take: 1 },
+          categories: {
+            where: { isPublished: true },
+            orderBy: { order: "asc" },
+            include: {
+              topics: {
+                where: { isPublished: true },
+                orderBy: { order: "asc" },
+                include: {
+                  progress: { where: { userId }, take: 1 },
+                  subtopics: {
+                    where: { isPublished: true },
+                    orderBy: { order: "asc" },
+                    include: {
+                      progress: { where: { userId }, take: 1 },
+                      quizzes: {
+                        where: { type: QuizType.SUBTOPIC, isPublished: true },
+                        take: 1,
+                        select: { id: true },
+                      },
+                    },
+                  },
+                  quizzes: {
+                    where: { type: QuizType.TOPIC_FINAL, isPublished: true },
+                    take: 1,
+                    select: { id: true },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+      if (!refreshed) return tree;
+
+      let completedSubtopics = 0;
+      const categories: CurriculumCategory[] = refreshed.categories.map((category) => ({
+        type: category.type as CategoryType,
+        slug: category.slug,
+        name: category.name,
+        description: category.description,
+        order: category.order,
+        topics: category.topics.map((topic) => {
+          const subtopics: CurriculumSubtopic[] = topic.subtopics.map((subtopic) => {
+            const st = subtopic.progress[0]?.status;
+            if (st === "COMPLETED" || st === "MASTERED") completedSubtopics += 1;
+            return {
+              slug: subtopic.slug,
+              title: subtopic.title,
+              description: subtopic.description,
+              order: subtopic.order,
+              quizId: subtopic.quizzes[0]?.id ?? null,
+              status: (st ?? "LOCKED") as ProgressStatus,
+            };
+          });
+          return {
+            slug: topic.slug,
+            title: topic.title,
+            description: topic.description,
+            order: topic.order,
+            difficulty: topic.difficulty as Difficulty,
+            subtopics,
+            topicFinalQuizId: topic.quizzes[0]?.id ?? null,
+          };
+        }),
+      }));
+
+      const totalSubtopics = countSubtopics(categories);
+      return {
+        code: refreshed.code as CefrLevelCode,
+        slug: refreshed.slug,
+        name: refreshed.name,
+        description: refreshed.description,
+        order: refreshed.order,
+        categories,
+        progressPercent: refreshed.progress[0]?.percent ?? 0,
+        totalSubtopics,
+        completedSubtopics,
+      };
+    });
+  }
 
   const categories: CurriculumCategory[] = level.categories.map((category) => ({
     type: category.type as CategoryType,
@@ -209,9 +309,10 @@ async function buildLevelTreeFromDb(
 
 export async function getLevelTree(
   levelSlug: string,
+  userId?: string,
 ): Promise<CurriculumLevelTree | null> {
   try {
-    const fromDb = await buildLevelTreeFromDb(levelSlug);
+    const fromDb = await buildLevelTreeFromDb(levelSlug, userId);
     if (fromDb) return fromDb;
   } catch {
     // Database unavailable — fall back to static curriculum
@@ -223,8 +324,9 @@ export async function getLevelTree(
 export async function getCategoryFromLevel(
   levelSlug: string,
   categorySlug: string,
+  userId?: string,
 ): Promise<{ level: CurriculumLevelTree; category: CurriculumCategory } | null> {
-  const level = await getLevelTree(levelSlug);
+  const level = await getLevelTree(levelSlug, userId);
   if (!level) return null;
 
   const category = level.categories.find((item) => item.slug === categorySlug);
@@ -237,12 +339,13 @@ export async function getTopicFromLevel(
   levelSlug: string,
   categorySlug: string,
   topicSlug: string,
+  userId?: string,
 ): Promise<{
   level: CurriculumLevelTree;
   category: CurriculumCategory;
   topic: CurriculumTopic;
 } | null> {
-  const result = await getCategoryFromLevel(levelSlug, categorySlug);
+  const result = await getCategoryFromLevel(levelSlug, categorySlug, userId);
   if (!result) return null;
 
   const topic = result.category.topics.find((item) => item.slug === topicSlug);
@@ -303,11 +406,36 @@ async function loadLessonFromDb(
   const siblings = await prisma.subtopic.findMany({
     where: { topicId: topic.id, isPublished: true },
     orderBy: { order: "asc" },
-    select: { slug: true },
+    select: { id: true, slug: true },
   });
   const subtopicIndex = siblings.findIndex((item) => item.slug === subtopicSlug);
-  const status: ProgressStatus =
+  let status: ProgressStatus =
     subtopicIndex === 0 ? "AVAILABLE" : "LOCKED";
+  let lessonDone = false;
+  let progressPercent = 0;
+
+  // Optional user progress — caller may pass via ensure
+  try {
+    const { auth } = await import("@/auth");
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (userId) {
+      const { ensureTopicUnlockState } = await import(
+        "@/services/progress-service"
+      );
+      await ensureTopicUnlockState(userId, topic.id);
+      const progress = await prisma.subtopicProgress.findUnique({
+        where: { userId_subtopicId: { userId, subtopicId: subtopic.id } },
+      });
+      if (progress) {
+        status = progress.status as ProgressStatus;
+        lessonDone = progress.lessonDone;
+        progressPercent = progress.progressPercent;
+      }
+    }
+  } catch {
+    // guest / auth unavailable
+  }
 
   const placeholder = buildLessonContent({
     topicTitle: topic.title,
@@ -339,6 +467,7 @@ async function loadLessonFromDb(
       };
 
   return {
+    id: subtopic.id,
     slug: subtopic.slug,
     title: subtopic.title,
     description: subtopic.description,
@@ -353,6 +482,8 @@ async function loadLessonFromDb(
     topicSlug: topic.slug,
     topicTitle: topic.title,
     lesson,
+    lessonDone,
+    progressPercent,
   };
 }
 
@@ -383,6 +514,7 @@ function loadLessonFromStatic(
 
   return {
     ...subtopic,
+    id: `static-${level.slug}-${category.slug}-${topic.slug}-${subtopic.slug}`,
     levelSlug: level.slug,
     levelCode: level.code,
     categorySlug: category.slug,
@@ -398,6 +530,8 @@ function loadLessonFromStatic(
       estimatedMin: 10,
       practiceId: null,
     },
+    lessonDone: false,
+    progressPercent: 0,
   };
 }
 

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { auth } from "@/auth";
 import { CourseTree } from "@/components/courses/course-tree";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -13,7 +14,8 @@ export default async function CourseLevelPage({
   const { locale, level: levelSlug } = await params;
   setRequestLocale(locale);
 
-  const level = await getLevelTree(levelSlug);
+  const session = await auth();
+  const level = await getLevelTree(levelSlug, session?.user?.id);
   if (!level) notFound();
 
   const tHome = await getTranslations("home");
@@ -36,7 +38,7 @@ export default async function CourseLevelPage({
           />
         </div>
         <p className="text-sm text-muted-foreground">
-          {tCourses("subtopicsCount", { count: level.totalSubtopics })}
+          {level.completedSubtopics}/{level.totalSubtopics} subtopics completed
         </p>
       </div>
 

@@ -25,13 +25,20 @@ export function LevelCard({
 }: LevelCardProps) {
   return (
     <Link href={href} className={cn("group block h-full", className)}>
-      <Card className="h-full transition-all duration-200 hover:-translate-y-1 hover:border-primary/40">
+      <Card
+        interactive
+        className="h-full transition-all duration-200 hover:-translate-y-1.5 hover:border-primary/40"
+      >
         <CardHeader>
           <div className="flex items-center justify-between gap-2">
-            <Badge variant="primary">{code}</Badge>
+            <Badge variant="primary" className="card-icon">
+              {code}
+            </Badge>
             <span className="text-xs text-muted-foreground">{topicsLabel}</span>
           </div>
-          <CardTitle className="mt-2 group-hover:text-primary">{name}</CardTitle>
+          <CardTitle className="mt-2 transition-colors group-hover:text-primary">
+            {name}
+          </CardTitle>
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent>

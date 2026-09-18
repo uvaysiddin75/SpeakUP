@@ -40,6 +40,7 @@ enum ProgressStatus {
   AVAILABLE
   IN_PROGRESS
   COMPLETED
+  MASTERED
 }
 
 enum TopicStatus {
@@ -109,6 +110,8 @@ model User {
   image         String?
   currentLevel  CefrCode  @default(A1)
   streak        Int       @default(0)
+  longestStreak Int       @default(0)
+  totalLearningSec Int    @default(0)
   lastActiveAt  DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -129,6 +132,9 @@ model User {
   readingProgress            ReadingProgress[]
   listeningProgress          ListeningProgress[]
   speakingProgress           SpeakingProgress[]
+  learningSessions           LearningSession[]
+  activities                 UserActivity[]
+  practiceAttempts           PracticeAttempt[]
 
   @@index([email])
   @@index([role])
@@ -298,8 +304,9 @@ model Practice {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  subtopic Subtopic       @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  subtopic Subtopic         @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
   items    PracticeItem[]
+  attempts PracticeAttempt[]
 }
 
 model PracticeItem {
@@ -507,17 +514,21 @@ model TopicProgress {
 }
 
 model SubtopicProgress {
-  id             String         @id @default(cuid())
-  userId         String
-  subtopicId     String
-  status         ProgressStatus @default(LOCKED)
-  lessonDone     Boolean        @default(false)
-  practiceDone   Boolean        @default(false)
-  bestScore      Float?
-  attemptsCount  Int            @default(0)
-  startedAt      DateTime?
-  completedAt    DateTime?
-  updatedAt      DateTime       @updatedAt
+  id               String         @id @default(cuid())
+  userId           String
+  subtopicId       String
+  status           ProgressStatus @default(LOCKED)
+  progressPercent  Float          @default(0)
+  lessonDone       Boolean        @default(false)
+  practiceDone     Boolean        @default(false)
+  testPassed       Boolean        @default(false)
+  bestScore        Float?
+  latestScore      Float?
+  attemptsCount    Int            @default(0)
+  lastActivityAt   DateTime?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  updatedAt        DateTime       @updatedAt
 
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   subtopic Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
@@ -577,21 +588,30 @@ model VocabularyWord {
 }
 
 model UserVocabulary {
-  id           String    @id @default(cuid())
-  userId       String
-  wordId       String
-  known        Boolean   @default(false)
-  favorite     Boolean   @default(false)
-  reviewCount  Int       @default(0)
-  lastReviewAt DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  userId          String
+  wordId          String
+  status          String    @default("new") // new | learning | learned | mastered
+  known           Boolean   @default(false)
+  favorite        Boolean   @default(false)
+  timesSeen       Int       @default(0)
+  correctAnswers  Int       @default(0)
+  wrongAnswers    Int       @default(0)
+  reviewCount     Int       @default(0)
+  easeFactor      Float     @default(2.5)
+  reviewInterval  Int       @default(0)
+  nextReviewAt    DateTime?
+  lastReviewAt    DateTime?
+  learnedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   user User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   word VocabularyWord @relation(fields: [wordId], references: [id], onDelete: Cascade)
 
   @@unique([userId, wordId])
   @@index([userId])
+  @@index([userId, nextReviewAt])
 }
 
 model VocabularyTopicProgress {
@@ -828,4 +848,53 @@ model SpeakingProgress {
 
   @@unique([userId, taskId])
   @@index([userId])
+}
+
+// ─── Learning sessions & activity feed ───────────────────────────────────────
+
+model LearningSession {
+  id           String    @id @default(cuid())
+  userId       String
+  kind         String // lesson | practice | quiz | vocabulary | reading | listening | speaking
+  entityId     String?
+  startedAt    DateTime  @default(now())
+  endedAt      DateTime?
+  durationSec  Int       @default(0)
+  createdAt    DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startedAt])
+}
+
+model UserActivity {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String // lesson_completed | practice_completed | test_passed | test_failed | word_learned | reading_completed | listening_completed | speaking_completed
+  title       String
+  description String?
+  meta        Json?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model PracticeAttempt {
+  id             String   @id @default(cuid())
+  userId         String
+  practiceId     String
+  score          Int
+  totalItems     Int
+  correctAnswers Int
+  percentage     Float
+  passed         Boolean
+  completedAt    DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  practice Practice @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+
+  @@index([userId, practiceId])
+  @@index([userId, completedAt])
 }

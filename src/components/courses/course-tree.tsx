@@ -55,6 +55,11 @@ const statusConfig: Record<
     icon: CheckCircle2,
     className: "text-success",
   },
+  MASTERED: {
+    label: "Mastered",
+    icon: CheckCircle2,
+    className: "text-warning",
+  },
 };
 
 function StatusIcon({ status }: { status: ProgressStatus }) {
@@ -118,7 +123,7 @@ function TopicBlock({
               ) : (
                 <Link
                   href={href}
-                  className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-muted/60"
+                  className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-all duration-200 hover:translate-x-0.5 hover:bg-muted/60"
                 >
                   <StatusIcon status={subtopic.status} />
                   <span>{subtopic.title}</span>

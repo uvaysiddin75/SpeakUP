@@ -5,6 +5,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { AuthSessionProvider } from "@/components/providers/auth-session-provider";
+import { UxProvider } from "@/components/providers/ux-provider";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -75,7 +76,7 @@ export default async function LocaleLayout({
         <ThemeProvider>
           <AuthSessionProvider>
             <NextIntlClientProvider messages={messages}>
-              {children}
+              <UxProvider>{children}</UxProvider>
             </NextIntlClientProvider>
           </AuthSessionProvider>
         </ThemeProvider>

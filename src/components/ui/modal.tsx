@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -14,8 +14,26 @@ interface ModalProps {
 }
 
 export function Modal({ open, onClose, title, children, className }: ModalProps) {
+  const [visible, setVisible] = useState(open);
+  const [closing, setClosing] = useState(false);
+
   useEffect(() => {
-    if (!open) return;
+    if (open) {
+      setVisible(true);
+      setClosing(false);
+      return;
+    }
+    if (!visible) return;
+    setClosing(true);
+    const id = window.setTimeout(() => {
+      setVisible(false);
+      setClosing(false);
+    }, 180);
+    return () => window.clearTimeout(id);
+  }, [open, visible]);
+
+  useEffect(() => {
+    if (!visible) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
@@ -25,9 +43,9 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
     };
-  }, [open, onClose]);
+  }, [visible, onClose]);
 
-  if (!open) return null;
+  if (!visible) return null;
 
   return (
     <div
@@ -38,13 +56,17 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
     >
       <button
         type="button"
-        className="absolute inset-0 bg-black/50"
+        className={cn(
+          "absolute inset-0 bg-black/50",
+          closing ? "modal-backdrop-out" : "modal-backdrop",
+        )}
         aria-label="Close dialog"
         onClick={onClose}
       />
       <div
         className={cn(
-          "relative z-10 w-full max-w-lg rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow)] animate-fade-up",
+          "relative z-10 w-full max-w-lg rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow)]",
+          closing ? "modal-panel-out" : "modal-panel",
           className,
         )}
       >

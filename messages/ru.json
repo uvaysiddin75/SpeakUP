@@ -38,23 +38,64 @@
   },
   "home": {
     "heroTitle": "Learn English. Speak with Confidence.",
-    "heroSubtitle": "Improve your English with interactive lessons, quizzes, vocabulary practice and personalized progress.",
-    "startLearning": "Начать обучение",
+    "heroSubtitle": "Полноценное приложение для английского: уроки, тесты, словарь, говорение и личный прогресс от A1 до C2.",
+    "startLearning": "Открыть приложение",
     "exploreCourses": "Смотреть курсы",
-    "whyTitle": "Почему SpeakUp?",
-    "whySubtitle": "Полный путь от A1 до C2 по шести ключевым навыкам.",
+    "openApp": "Войти в SpeakUp",
+    "whyTitle": "Всё английское обучение в одном приложении",
+    "whySubtitle": "Шесть навыков, шесть уровней CEFR и понятный путь от первых слов до уверенной речи.",
     "levelsTitle": "Выберите уровень",
     "levelsSubtitle": "Структурированные курсы по шкале CEFR.",
     "topics": "{count} тем",
     "ctaTitle": "Готовы говорить уверенно?",
-    "ctaSubtitle": "Присоединяйтесь к SpeakUp и начните персональный путь в английском.",
+    "ctaSubtitle": "Откройте SpeakUp и продолжите персональный путь в английском уже сегодня.",
+    "heroAppLabel": "Ваш путь обучения",
+    "heroAppTitle": "От A1 до свободной речи",
+    "heroProgressLabel": "Общий прогресс",
+    "heroBadgeLessons": "Интерактивные уроки",
+    "heroBadgeSpeaking": "Практика речи",
+    "heroBadgeProgress": "Живой прогресс",
+    "heroFloatingStreak": "Текущая серия",
+    "heroFloatingWords": "Выучено слов",
+    "days": "дней",
+    "pathGrammar": "Grammar & Vocabulary",
+    "pathGrammarValue": "Структурные уроки",
+    "pathSkills": "Reading & Listening",
+    "pathSkillsValue": "Понимание на практике",
+    "pathSpeaking": "Writing & Speaking",
+    "pathSpeakingValue": "Активная практика",
+    "statLevelsShort": "Уровни",
+    "statSkillsShort": "Навыки",
+    "statRangeShort": "Диапазон",
+    "stats": {
+      "lessons": "Уроки и практика",
+      "levels": "Уровни CEFR",
+      "skills": "Ключевые навыки",
+      "path": "Полный путь"
+    },
+    "howTitle": "Как работает SpeakUp",
+    "howSubtitle": "Простой цикл: ежедневная практика превращается в реальные навыки английского.",
+    "how": {
+      "choose": {
+        "title": "Выберите уровень",
+        "description": "Начните с A1–C2 и идите по структурированной программе под ваш этап."
+      },
+      "practice": {
+        "title": "Тренируйте навыки",
+        "description": "Грамматика, словарь, чтение, аудирование, письмо и говорение — всё в одном месте."
+      },
+      "grow": {
+        "title": "Растите с прогрессом",
+        "description": "Серии, завершённые уроки и прогресс показывают, что делать дальше."
+      }
+    },
     "features": {
-      "grammar": { "title": "Grammar", "description": "Master English grammar." },
-      "vocabulary": { "title": "Vocabulary", "description": "Build a strong vocabulary." },
-      "reading": { "title": "Reading", "description": "Improve reading comprehension." },
-      "listening": { "title": "Listening", "description": "Train your listening skills." },
-      "writing": { "title": "Writing", "description": "Practice writing." },
-      "speaking": { "title": "Speaking", "description": "Build confidence in speaking." }
+      "grammar": { "title": "Grammar", "description": "Понятные объяснения, практика и тесты по темам." },
+      "vocabulary": { "title": "Vocabulary", "description": "Списки слов, карточки и регулярная практика." },
+      "reading": { "title": "Reading", "description": "Тексты с вопросами на понимание по уровням." },
+      "listening": { "title": "Listening", "description": "Аудиоуроки с транскриптом и проверкой." },
+      "writing": { "title": "Writing", "description": "Письменные задания с сохранением ответов." },
+      "speaking": { "title": "Speaking", "description": "Записывайте себя и растите уверенность в речи." }
     },
     "levels": {
       "A1": { "name": "Beginner", "description": "Start with basics: greetings, simple sentences, and everyday words." },
@@ -120,7 +161,8 @@
     },
     "settings": {
       "title": "Настройки",
-      "subtitle": "Язык, тема, уведомления и аккаунт."
+      "subtitle": "Язык, тема, звуки и аккаунт.",
+      "languageHint": "Только язык интерфейса — материалы уроков остаются на английском."
     },
     "login": {
       "title": "С возвращением",
@@ -136,6 +178,10 @@
     "light": "Светлая",
     "dark": "Тёмная",
     "system": "Системная"
+  },
+  "sound": {
+    "title": "Звуковые эффекты",
+    "subtitle": "Управляйте звуками тестов, достижений и говорения."
   },
   "language": {
     "label": "Язык",

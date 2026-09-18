@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { Check, ChevronLeft, ChevronRight, Heart, RotateCcw, Volume2 } from "lucide-react";
+import { useUxOptional } from "@/components/providers/ux-provider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -34,6 +35,7 @@ export function VocabularyFlashcards({
   initiallyLearned = [],
   onLearnedChange,
 }: VocabularyFlashcardsProps) {
+  const ux = useUxOptional();
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -51,14 +53,26 @@ export function VocabularyFlashcards({
     setFlipped(false);
   };
 
-  const speak = useCallback((text: string) => {
-    if (typeof window === "undefined" || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "en-US";
-    utter.rate = 0.9;
-    window.speechSynthesis.speak(utter);
-  }, []);
+  const speak = useCallback(
+    async (text: string, audioUrl?: string | null) => {
+      if (audioUrl) {
+        try {
+          const audio = new Audio(audioUrl);
+          await audio.play();
+          return;
+        } catch {
+          // fall through to speech synthesis
+        }
+      }
+      if (typeof window === "undefined" || !window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      utter.rate = 0.9;
+      window.speechSynthesis.speak(utter);
+    },
+    [],
+  );
 
   const toggleLearned = () => {
     if (!current) return;
@@ -68,6 +82,32 @@ export function VocabularyFlashcards({
       else {
         next.add(current.id);
         markWordLearned(topicId, current.id);
+        // Persist to DB when signed in (fire-and-forget)
+        void fetch("/api/progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "mark_word", wordId: current.id }),
+        }).catch(() => {
+          // guest / offline — local progress still kept
+        });
+        if (next.size === words.length && words.length > 0) {
+          ux?.play("achievement");
+          ux?.toast({
+            title: "🏆 Achievement Unlocked!",
+            description: "Topic vocabulary completed",
+            tone: "achievement",
+            icon: "achievement",
+          });
+          ux?.celebrate({ intensity: "soft" });
+        } else {
+          ux?.toast({
+            title: "Word learned ✓",
+            description: current.word,
+            tone: "success",
+            icon: "success",
+            durationMs: 2000,
+          });
+        }
       }
       onLearnedChange?.([...next]);
       return next;
@@ -100,7 +140,7 @@ export function VocabularyFlashcards({
           type="button"
           onClick={() => setFlipped((v) => !v)}
           className={cn(
-            "relative w-full min-h-[280px] rounded-2xl border border-border bg-card text-left shadow-[var(--shadow)] transition-transform duration-500 [transform-style:preserve-3d] sm:min-h-[320px]",
+            "relative w-full min-h-[280px] rounded-2xl border border-border bg-card text-left shadow-[var(--shadow)] transition-transform duration-500 [transform-style:preserve-3d] hover:shadow-[var(--shadow-hover)] sm:min-h-[320px]",
             flipped && "[transform:rotateY(180deg)]",
           )}
           aria-label={flipped ? "Show word" : "Show translation"}
@@ -117,7 +157,7 @@ export function VocabularyFlashcards({
                 {current.word}
               </p>
               {current.pronunciation ? (
-                <p className="text-sm text-muted-foreground">{current.pronunciation}</p>
+                <p className="text-sm text-muted-foreground">/{current.pronunciation}/</p>
               ) : null}
               <p className="text-xs text-muted-foreground">Tap to flip</p>
             </div>
@@ -129,13 +169,14 @@ export function VocabularyFlashcards({
               <p className="text-xl font-semibold text-primary">{current.translationRu}</p>
               <p className="text-sm text-muted-foreground">{current.translationUz}</p>
               {current.pronunciation ? (
-                <p className="text-sm text-muted-foreground">{current.pronunciation}</p>
+                <p className="text-sm text-muted-foreground">/{current.pronunciation}/</p>
               ) : null}
               {current.example ? (
                 <p className="rounded-xl bg-card/80 px-3 py-2 text-sm italic shadow-sm">
                   “{current.example}”
                 </p>
               ) : null}
+              <p className="pt-2 text-xs text-muted-foreground">Tap to flip back</p>
             </div>
           </div>
         </button>
@@ -152,9 +193,14 @@ export function VocabularyFlashcards({
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="outline" onClick={() => speak(current.word)}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => void speak(current.word, current.audioUrl)}
+          aria-label="Pronounce word"
+        >
           <Volume2 className="mr-1.5 h-4 w-4" />
-          Pronounce
+          🔊 Pronounce
         </Button>
         <Button
           type="button"
@@ -182,11 +228,7 @@ export function VocabularyFlashcards({
           <Check className="mr-1.5 h-4 w-4" />
           {knownLabel ? "Learned" : "Mark learned"}
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => goTo(0)}
-        >
+        <Button type="button" variant="ghost" onClick={() => goTo(0)}>
           <RotateCcw className="mr-1.5 h-4 w-4" />
           Restart
         </Button>

@@ -62,6 +62,7 @@ export interface SubtopicLesson {
 }
 
 export interface SubtopicDetail extends CurriculumSubtopic {
+  id: string;
   levelSlug: string;
   levelCode: CefrLevelCode;
   categorySlug: string;
@@ -70,6 +71,8 @@ export interface SubtopicDetail extends CurriculumSubtopic {
   topicSlug: string;
   topicTitle: string;
   lesson: SubtopicLesson;
+  lessonDone?: boolean;
+  progressPercent?: number;
 }
 
 export interface BreadcrumbItem {

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+import { getAdminUserProgressList } from "@/services/progress-service";
 
 async function safeCounts() {
   try {
@@ -52,6 +53,7 @@ export default async function AdminPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const counts = await safeCounts();
+  const users = await getAdminUserProgressList().catch(() => []);
 
   const sections = [
     {
@@ -92,10 +94,7 @@ export default async function AdminPage({
             <Badge variant="warning">CMS</Badge>
           </div>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Manage curriculum content for Vocabulary, Reading, Listening, and
-            Speaking. Full CRUD forms are seeded via{" "}
-            <code className="rounded bg-muted px-1">npm run db:seed</code>; use
-            skill hubs to review published content.
+            Curriculum overview and real user progress from PostgreSQL.
           </p>
         </div>
         <Button asChild variant="outline">
@@ -124,13 +123,9 @@ export default async function AdminPage({
               {"extra" in section && section.extra ? (
                 <p className="text-xs text-muted-foreground">{section.extra}</p>
               ) : null}
-              <div className="flex flex-wrap gap-2">
-                <Button asChild size="sm">
-                  <Link href={section.href}>Open published</Link>
-                </Button>
-                <Badge variant="success">Publish</Badge>
-                <Badge>Create / Edit / Delete via seed</Badge>
-              </div>
+              <Button asChild size="sm">
+                <Link href={section.href}>Open published</Link>
+              </Button>
             </CardContent>
           </Card>
         ))}
@@ -138,23 +133,32 @@ export default async function AdminPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Content operations</CardTitle>
+          <CardTitle>User progress</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>
-            Schema supports Create / Edit / Delete / Publish for Levels,
-            Categories, Topics, Subtopics, Lessons, Words, Texts, Audio,
-            Questions, Tests, and Speaking Tasks.
-          </p>
-          <p>
-            Run <code className="rounded bg-muted px-1">npm run db:push</code>{" "}
-            then <code className="rounded bg-muted px-1">npm run db:seed</code>{" "}
-            to refresh all A1–C2 skill content and quizzes.
-          </p>
-          <p>
-            Admin user: <strong>admin@speakup.local</strong> (role ADMIN). Auth
-            UI remains Stage 4; this panel is available for content review now.
-          </p>
+        <CardContent className="space-y-3">
+          {users.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No users yet.</p>
+          ) : (
+            users.map((user) => (
+              <div
+                key={user.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border px-3 py-2 text-sm"
+              >
+                <div>
+                  <p className="font-semibold">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <Badge variant="primary">{user.currentLevel}</Badge>
+                  <Badge>{user.overall}% overall</Badge>
+                  <Badge variant="accent">🔥 {user.streak}</Badge>
+                  <span className="text-muted-foreground">
+                    {user.tests} tests · {user.words} words
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
         </CardContent>
       </Card>
     </div>

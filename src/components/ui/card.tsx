@@ -3,12 +3,14 @@ import { cn } from "@/lib/utils";
 
 export function Card({
   className,
+  interactive = false,
   ...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement> & { interactive?: boolean }) {
   return (
     <div
       className={cn(
         "card-hover rounded-2xl border border-border bg-card text-card-foreground shadow-[var(--shadow)]",
+        interactive && "card-interactive",
         className,
       )}
       {...props}

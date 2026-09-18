@@ -38,23 +38,64 @@
   },
   "home": {
     "heroTitle": "Learn English. Speak with Confidence.",
-    "heroSubtitle": "Improve your English with interactive lessons, quizzes, vocabulary practice and personalized progress.",
-    "startLearning": "Start Learning",
+    "heroSubtitle": "A full English learning app: interactive lessons, quizzes, vocabulary, speaking practice and personalized progress from A1 to C2.",
+    "startLearning": "Open the app",
     "exploreCourses": "Explore Courses",
-    "whyTitle": "Why SpeakUp?",
-    "whySubtitle": "A complete path from A1 to C2 across the six core skills.",
+    "openApp": "Enter SpeakUp",
+    "whyTitle": "Everything in one English app",
+    "whySubtitle": "Six skills, six CEFR levels, and a clear path from first words to fluent speech.",
     "levelsTitle": "Choose your level",
     "levelsSubtitle": "Structured courses mapped to the CEFR framework.",
     "topics": "{count} topics",
     "ctaTitle": "Ready to speak with confidence?",
-    "ctaSubtitle": "Join SpeakUp and start your personalized English journey today.",
+    "ctaSubtitle": "Open SpeakUp and continue your personalized English journey today.",
+    "heroAppLabel": "Your learning path",
+    "heroAppTitle": "From A1 to fluent speech",
+    "heroProgressLabel": "Overall progress",
+    "heroBadgeLessons": "Interactive lessons",
+    "heroBadgeSpeaking": "Speaking practice",
+    "heroBadgeProgress": "Live progress",
+    "heroFloatingStreak": "Current streak",
+    "heroFloatingWords": "Words learned",
+    "days": "days",
+    "pathGrammar": "Grammar & Vocabulary",
+    "pathGrammarValue": "Structured lessons",
+    "pathSkills": "Reading & Listening",
+    "pathSkillsValue": "Real comprehension",
+    "pathSpeaking": "Writing & Speaking",
+    "pathSpeakingValue": "Active practice",
+    "statLevelsShort": "Levels",
+    "statSkillsShort": "Skills",
+    "statRangeShort": "Range",
+    "stats": {
+      "lessons": "Lessons & practice",
+      "levels": "CEFR levels",
+      "skills": "Core skills",
+      "path": "Full learning path"
+    },
+    "howTitle": "How SpeakUp works",
+    "howSubtitle": "A simple loop that turns daily practice into real English skills.",
+    "how": {
+      "choose": {
+        "title": "Pick your level",
+        "description": "Start at A1–C2 and follow a structured course path built for your stage."
+      },
+      "practice": {
+        "title": "Train all skills",
+        "description": "Practice grammar, vocabulary, reading, listening, writing and speaking in one place."
+      },
+      "grow": {
+        "title": "Track and grow",
+        "description": "See streaks, completed lessons and progress so you always know what to do next."
+      }
+    },
     "features": {
-      "grammar": { "title": "Grammar", "description": "Master English grammar." },
-      "vocabulary": { "title": "Vocabulary", "description": "Build a strong vocabulary." },
-      "reading": { "title": "Reading", "description": "Improve reading comprehension." },
-      "listening": { "title": "Listening", "description": "Train your listening skills." },
-      "writing": { "title": "Writing", "description": "Practice writing." },
-      "speaking": { "title": "Speaking", "description": "Build confidence in speaking." }
+      "grammar": { "title": "Grammar", "description": "Clear explanations with practice and topic tests." },
+      "vocabulary": { "title": "Vocabulary", "description": "Word lists, flashcards and spaced practice." },
+      "reading": { "title": "Reading", "description": "Texts with comprehension questions by level." },
+      "listening": { "title": "Listening", "description": "Audio lessons with transcripts and checks." },
+      "writing": { "title": "Writing", "description": "Guided writing tasks you can save and revisit." },
+      "speaking": { "title": "Speaking", "description": "Record yourself and build real speaking confidence." }
     },
     "levels": {
       "A1": { "name": "Beginner", "description": "Start with basics: greetings, simple sentences, and everyday words." },
@@ -120,7 +161,8 @@
     },
     "settings": {
       "title": "Settings",
-      "subtitle": "Language, theme, notifications, and account."
+      "subtitle": "Language, theme, sound effects, and account.",
+      "languageHint": "Interface language only — lesson content stays in English."
     },
     "login": {
       "title": "Welcome back",
@@ -136,6 +178,10 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "sound": {
+    "title": "Sound Effects",
+    "subtitle": "Control feedback sounds for tests, achievements and speaking."
   },
   "language": {
     "label": "Language",

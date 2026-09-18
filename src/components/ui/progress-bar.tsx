@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ProgressBarProps {
@@ -6,6 +10,8 @@ interface ProgressBarProps {
   label?: string;
   showValue?: boolean;
   tone?: "primary" | "success" | "warning" | "danger";
+  /** Animate fill from 0 on mount / value change */
+  animated?: boolean;
 }
 
 const tones = {
@@ -21,15 +27,48 @@ export function ProgressBar({
   label,
   showValue = true,
   tone = "primary",
+  animated = true,
 }: ProgressBarProps) {
   const clamped = Math.max(0, Math.min(100, value));
+  const [display, setDisplay] = useState(animated ? 0 : clamped);
+  const [completeFlash, setCompleteFlash] = useState(false);
+
+  useEffect(() => {
+    if (!animated) {
+      setDisplay(clamped);
+      return;
+    }
+    const id = requestAnimationFrame(() => setDisplay(clamped));
+    return () => cancelAnimationFrame(id);
+  }, [clamped, animated]);
+
+  useEffect(() => {
+    if (clamped < 100) {
+      setCompleteFlash(false);
+      return;
+    }
+    setCompleteFlash(true);
+    const t = window.setTimeout(() => setCompleteFlash(false), 900);
+    return () => window.clearTimeout(t);
+  }, [clamped]);
 
   return (
     <div className={cn("w-full", className)}>
       {(label || showValue) && (
         <div className="mb-1.5 flex items-center justify-between text-xs font-medium text-muted-foreground">
           {label ? <span>{label}</span> : <span />}
-          {showValue ? <span className="tabular-nums">{clamped}%</span> : null}
+          <span className="inline-flex items-center gap-1 tabular-nums">
+            {showValue ? <span>{Math.round(display)}%</span> : null}
+            {clamped >= 100 ? (
+              <Check
+                className={cn(
+                  "h-3.5 w-3.5 text-success",
+                  completeFlash && "animate-check-pop",
+                )}
+                aria-label="Complete"
+              />
+            ) : null}
+          </span>
         </div>
       )}
       <div
@@ -44,8 +83,9 @@ export function ProgressBar({
           className={cn(
             "h-full rounded-full transition-[width] duration-700 ease-out",
             tones[tone],
+            clamped >= 100 && "bg-success",
           )}
-          style={{ width: `${clamped}%` }}
+          style={{ width: `${display}%` }}
         />
       </div>
     </div>

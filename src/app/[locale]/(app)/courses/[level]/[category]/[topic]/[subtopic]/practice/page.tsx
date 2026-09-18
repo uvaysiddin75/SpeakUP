@@ -1,8 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { auth } from "@/auth";
 import { CourseBreadcrumbs } from "@/components/courses/course-breadcrumbs";
+import { PracticePlayer } from "@/components/courses/practice-player";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Link } from "@/i18n/navigation";
 import {
@@ -30,6 +31,7 @@ export default async function PracticePage({
   } = await params;
   setRequestLocale(locale);
 
+  const session = await auth();
   const practice = await getPracticeDetail(
     levelSlug,
     categorySlug,
@@ -80,38 +82,26 @@ export default async function PracticePage({
         <EmptyState
           title={tCourses("practice")}
           description={tCourses("practiceEmpty")}
+          action={
+            <Button asChild>
+              <Link href={testHref}>{tCourses("startTest")}</Link>
+            </Button>
+          }
         />
       ) : (
-        <div className="space-y-4">
-          {practice.items.map((item, index) => (
-            <Card key={item.id}>
-              <CardHeader>
-                <CardTitle className="text-base">
-                  {index + 1}. {item.prompt}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {Array.isArray(item.options) ? (
-                  <ul className="space-y-2">
-                    {item.options.map((option) => (
-                      <li
-                        key={String(option)}
-                        className="rounded-xl border border-border px-3 py-2 text-sm"
-                      >
-                        {String(option)}
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-                {item.explanation ? (
-                  <p className="text-sm text-muted-foreground">
-                    {item.explanation}
-                  </p>
-                ) : null}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <PracticePlayer
+          practiceId={practice.id}
+          title={practice.title}
+          items={practice.items.map((item) => ({
+            id: item.id,
+            prompt: item.prompt,
+            options: item.options,
+            explanation: item.explanation,
+          }))}
+          lessonHref={lessonHref}
+          testHref={testHref}
+          guestMode={!session?.user?.id}
+        />
       )}
 
       <div className="flex flex-col gap-3 sm:flex-row">

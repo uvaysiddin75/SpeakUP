@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { Check, X } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
+import { useUxOptional } from "@/components/providers/ux-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -49,6 +51,7 @@ export function QuizPlayer({
   questions,
 }: QuizPlayerProps) {
   const router = useRouter();
+  const ux = useUxOptional();
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [selected, setSelected] = useState<unknown>(null);
@@ -57,6 +60,7 @@ export function QuizPlayer({
   const [result, setResult] = useState<GradeResult | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [shake, setShake] = useState(false);
   const [feedback, setFeedback] = useState<{
     isCorrect: boolean;
     correctAnswer: unknown;
@@ -75,6 +79,29 @@ export function QuizPlayer({
     return [] as string[];
   }, [question]);
 
+  useEffect(() => {
+    if (!result || !ux) return;
+    if (result.passed) {
+      ux.play(result.percentage >= 90 ? "level-complete" : "achievement");
+      ux.celebrate({ intensity: result.percentage >= 90 ? "strong" : "soft" });
+      ux.toast({
+        title: result.percentage >= 90 ? "🎉 Excellent score!" : "🎉 Test Completed",
+        description: `${result.percentage}% · ${result.title}`,
+        tone: "success",
+        icon: "success",
+      });
+    } else {
+      ux.toast({
+        title: "Keep practicing",
+        description: `You need ${result.passScore}% to pass.`,
+        tone: "info",
+        icon: "info",
+      });
+    }
+    // only on result set
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result]);
+
   if (!question && !result) {
     return (
       <Card>
@@ -87,7 +114,7 @@ export function QuizPlayer({
 
   if (result) {
     return (
-      <div className="mx-auto max-w-2xl space-y-6">
+      <div className="mx-auto max-w-2xl space-y-6 animate-scale-in">
         <Card className="overflow-hidden">
           <div className="speakup-hero-panel px-6 py-8 text-center text-white">
             <CircularProgress
@@ -100,7 +127,7 @@ export function QuizPlayer({
               {result.percentage}%
             </h1>
             <p className="mt-1 text-lg font-semibold text-white/95">
-              {result.passed ? "Great job! 🎉" : "Keep practicing"}
+              {result.passed ? "Test Completed 🎉" : "Keep practicing"}
             </p>
             <p className="mt-1 text-sm text-white/75">{result.title}</p>
           </div>
@@ -193,7 +220,7 @@ export function QuizPlayer({
         </div>
       </div>
 
-      <Card>
+      <Card className={cn(shake && "animate-shake")}>
         <CardContent className="space-y-5 p-6">
           <p className="text-lg font-medium leading-relaxed">{question!.prompt}</p>
 
@@ -216,15 +243,22 @@ export function QuizPlayer({
                     disabled={revealed || pending}
                     onClick={() => setSelected(option)}
                     className={cn(
-                      "w-full rounded-2xl border px-4 py-3.5 text-left text-sm font-medium transition-all",
-                      active && !revealed && "border-primary bg-primary/10 shadow-sm",
-                      showCorrect && "border-success bg-success/15 text-success",
-                      showWrong && "border-danger bg-danger/15 text-danger",
-                      !active && !showCorrect && "border-border hover:border-primary/30 hover:bg-muted",
+                      "w-full rounded-2xl border px-4 py-3.5 text-left text-sm font-medium transition-all duration-200",
+                      active && !revealed && "border-primary bg-primary/10 shadow-sm scale-[1.01]",
+                      showCorrect &&
+                        "border-success bg-success/15 text-success answer-flash-correct",
+                      showWrong &&
+                        "border-danger bg-danger/15 text-danger answer-flash-wrong",
+                      !active &&
+                        !showCorrect &&
+                        "border-border hover:border-primary/30 hover:bg-muted hover:translate-x-0.5",
                     )}
                   >
-                    <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full border border-current/30 text-[10px]" aria-hidden>
-                      ○
+                    <span
+                      className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full border border-current/30 text-[10px]"
+                      aria-hidden
+                    >
+                      {showCorrect ? "✓" : showWrong ? "✕" : "○"}
                     </span>
                     {option}
                   </button>
@@ -244,29 +278,44 @@ export function QuizPlayer({
           {feedback ? (
             <div
               className={cn(
-                "rounded-xl px-4 py-3 text-sm",
+                "flex items-start gap-3 rounded-xl px-4 py-3 text-sm animate-fade-up",
                 feedback.isCorrect
                   ? "bg-success/15 text-success"
                   : "bg-danger/15 text-danger",
               )}
             >
-              <p className="font-semibold">
-                {feedback.isCorrect ? "Correct" : "Incorrect"}
-              </p>
-              {!feedback.isCorrect ? (
-                <p className="mt-1">
-                  Correct answer: {formatAnswer(feedback.correctAnswer)}
+              <span
+                className={cn(
+                  "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
+                  feedback.isCorrect ? "bg-success/20 animate-check-pop" : "bg-danger/20",
+                )}
+              >
+                {feedback.isCorrect ? (
+                  <Check className="h-3.5 w-3.5" />
+                ) : (
+                  <X className="h-3.5 w-3.5" />
+                )}
+              </span>
+              <div>
+                <p className="font-semibold">
+                  {feedback.isCorrect ? "Correct ✓" : "Incorrect ✕"}
                 </p>
-              ) : null}
-              {feedback.explanation ? (
-                <p className="mt-1 opacity-90">{feedback.explanation}</p>
-              ) : null}
+                {!feedback.isCorrect ? (
+                  <p className="mt-1">
+                    Correct answer: {formatAnswer(feedback.correctAnswer)}
+                  </p>
+                ) : null}
+                {feedback.explanation ? (
+                  <p className="mt-1 opacity-90">{feedback.explanation}</p>
+                ) : null}
+              </div>
             </div>
           ) : null}
 
           <div className="flex flex-wrap gap-2">
             {!revealed ? (
               <Button
+                loading={pending}
                 disabled={selected === null || selected === "" || pending}
                 onClick={() => {
                   startTransition(async () => {
@@ -278,7 +327,17 @@ export function QuizPlayer({
                         userAnswer: currentAnswer,
                       }),
                     });
-                    if (!response.ok) return;
+                    if (!response.ok) {
+                      setShake(true);
+                      window.setTimeout(() => setShake(false), 400);
+                      ux?.toast({
+                        title: "Something went wrong",
+                        description: "Could not check this answer.",
+                        tone: "error",
+                        icon: "error",
+                      });
+                      return;
+                    }
                     const data = (await response.json()) as {
                       isCorrect: boolean;
                       correctAnswer: unknown;
@@ -290,10 +349,17 @@ export function QuizPlayer({
                     }));
                     setFeedback(data);
                     setRevealed(true);
+                    if (data.isCorrect) {
+                      ux?.play("correct");
+                    } else {
+                      ux?.play("wrong");
+                      setShake(true);
+                      window.setTimeout(() => setShake(false), 400);
+                    }
                   });
                 }}
               >
-                {pending ? "Checking…" : "Check"}
+                Check
               </Button>
             ) : index < questions.length - 1 ? (
               <Button
@@ -308,6 +374,7 @@ export function QuizPlayer({
               </Button>
             ) : (
               <Button
+                loading={pending}
                 disabled={pending}
                 onClick={() => {
                   startTransition(async () => {
@@ -328,14 +395,22 @@ export function QuizPlayer({
                       body: JSON.stringify(payload),
                     });
                     if (!response.ok) {
-                      throw new Error("Failed to grade quiz");
+                      setShake(true);
+                      window.setTimeout(() => setShake(false), 400);
+                      ux?.toast({
+                        title: "Something went wrong",
+                        description: "Failed to grade quiz.",
+                        tone: "error",
+                        icon: "error",
+                      });
+                      return;
                     }
                     const data = (await response.json()) as GradeResult;
                     setResult(data);
                   });
                 }}
               >
-                {pending ? "Calculating…" : "See results"}
+                See results
               </Button>
             )}
           </div>

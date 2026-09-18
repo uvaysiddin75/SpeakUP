@@ -12,7 +12,7 @@ interface StatCardProps {
 
 export function StatCard({ label, value, icon, hint, className }: StatCardProps) {
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card interactive className={cn("overflow-hidden", className)}>
       <CardContent className="flex items-start justify-between gap-3 p-5">
         <div>
           <p className="text-sm text-muted-foreground">{label}</p>
@@ -24,7 +24,7 @@ export function StatCard({ label, value, icon, hint, className }: StatCardProps)
           ) : null}
         </div>
         {icon ? (
-          <div className="rounded-xl bg-primary/10 p-2.5 text-primary">{icon}</div>
+          <div className="card-icon rounded-xl bg-primary/10 p-2.5 text-primary">{icon}</div>
         ) : null}
       </CardContent>
     </Card>

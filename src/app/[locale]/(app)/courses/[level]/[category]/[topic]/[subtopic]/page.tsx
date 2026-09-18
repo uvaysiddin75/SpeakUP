@@ -1,10 +1,14 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BookOpen, ClipboardCheck, Lock, PenLine } from "lucide-react";
+import { auth } from "@/auth";
 import { CourseBreadcrumbs } from "@/components/courses/course-breadcrumbs";
+import { CompleteLessonButton } from "@/components/courses/complete-lesson-button";
+import { LearningSessionTracker } from "@/components/progress/learning-session-tracker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProgressBar } from "@/components/ui/progress-bar";
 import { Link } from "@/i18n/navigation";
 import { getQuizHref } from "@/lib/curriculum";
 import {
@@ -32,6 +36,7 @@ export default async function CourseSubtopicPage({
   } = await params;
   setRequestLocale(locale);
 
+  const session = await auth();
   const subtopic = await getSubtopicDetail(
     levelSlug,
     categorySlug,
@@ -85,6 +90,7 @@ export default async function CourseSubtopicPage({
 
   return (
     <div className="space-y-8">
+      <LearningSessionTracker kind="lesson" entityId={subtopic.id} />
       <CourseBreadcrumbs items={breadcrumbs} />
 
       <div className="space-y-3">
@@ -94,11 +100,22 @@ export default async function CourseSubtopicPage({
           <Badge variant="accent">
             {tCourses("estimatedMin", { count: subtopic.lesson.estimatedMin })}
           </Badge>
+          {subtopic.status === "COMPLETED" || subtopic.status === "MASTERED" ? (
+            <Badge variant="success">
+              {subtopic.status === "MASTERED" ? "⭐ Mastered" : "✓ Completed"}
+            </Badge>
+          ) : null}
         </div>
         <h1 className="font-display text-3xl font-bold tracking-tight">
           {subtopic.title}
         </h1>
         <p className="max-w-2xl text-muted-foreground">{subtopic.description}</p>
+        <div className="max-w-md">
+          <ProgressBar
+            value={subtopic.progressPercent ?? 0}
+            label="Subtopic progress"
+          />
+        </div>
       </div>
 
       <Card>
@@ -174,6 +191,12 @@ export default async function CourseSubtopicPage({
           </CardContent>
         </Card>
       ) : null}
+
+      <CompleteLessonButton
+        subtopicId={subtopic.id}
+        alreadyDone={!!subtopic.lessonDone}
+        guestMode={!session?.user?.id}
+      />
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button variant="secondary" className="flex-1" asChild>

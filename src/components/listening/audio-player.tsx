@@ -152,6 +152,24 @@ export function AudioPlayer({
         </div>
       </div>
 
+      {/* Animated waveform */}
+      <div className="mb-4 flex h-10 items-end justify-center gap-1" aria-hidden>
+        {Array.from({ length: 28 }, (_, i) => (
+          <span
+            key={i}
+            className={cn(
+              "wave-bar w-1 rounded-full bg-primary/70",
+              playing && "wave-bar-playing",
+            )}
+            style={{
+              height: `${8 + (i % 5) * 4}px`,
+              animationDelay: `${(i % 7) * 70}ms`,
+              opacity: playing ? 1 : 0.35,
+            }}
+          />
+        ))}
+      </div>
+
       {audioUrl ? (
         <audio
           ref={audioRef}

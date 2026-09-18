@@ -12,7 +12,8 @@ export type ProgressStatus =
   | "LOCKED"
   | "AVAILABLE"
   | "IN_PROGRESS"
-  | "COMPLETED";
+  | "COMPLETED"
+  | "MASTERED";
 
 export type TopicStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
 

@@ -7,6 +7,7 @@ import {
   Lock,
   PlayCircle,
 } from "lucide-react";
+import { auth } from "@/auth";
 import { CourseBreadcrumbs } from "@/components/courses/course-breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,6 +36,11 @@ const statusIcons: Record<
     className: "text-success",
     label: "Completed",
   },
+  MASTERED: {
+    icon: CheckCircle2,
+    className: "text-warning",
+    label: "Mastered",
+  },
 };
 
 export default async function CourseTopicPage({
@@ -55,7 +61,13 @@ export default async function CourseTopicPage({
   } = await params;
   setRequestLocale(locale);
 
-  const result = await getTopicFromLevel(levelSlug, categorySlug, topicSlug);
+  const session = await auth();
+  const result = await getTopicFromLevel(
+    levelSlug,
+    categorySlug,
+    topicSlug,
+    session?.user?.id,
+  );
   if (!result) notFound();
 
   const { level, category, topic } = result;

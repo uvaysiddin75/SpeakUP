@@ -38,23 +38,64 @@
   },
   "home": {
     "heroTitle": "Learn English. Speak with Confidence.",
-    "heroSubtitle": "Improve your English with interactive lessons, quizzes, vocabulary practice and personalized progress.",
-    "startLearning": "O‘rganishni boshlash",
+    "heroSubtitle": "To‘liq ingliz tili ilovasi: darslar, testlar, lug‘at, gapirish va A1 dan C2 gacha shaxsiy progress.",
+    "startLearning": "Ilovani ochish",
     "exploreCourses": "Kurslarni ko‘rish",
-    "whyTitle": "Nima uchun SpeakUp?",
-    "whySubtitle": "A1 dan C2 gacha olti asosiy ko‘nikma bo‘yicha to‘liq yo‘l.",
+    "openApp": "SpeakUp’ga kirish",
+    "whyTitle": "Barcha ingliz tili o‘qishi bir ilovada",
+    "whySubtitle": "Olti ko‘nikma, olti CEFR darajasi va birinchi so‘zlardan erkin gapirishgacha aniq yo‘l.",
     "levelsTitle": "Darajangizni tanlang",
     "levelsSubtitle": "CEFR bo‘yicha tuzilgan kurslar.",
     "topics": "{count} mavzu",
     "ctaTitle": "Ishonch bilan gapirishga tayyormisiz?",
-    "ctaSubtitle": "SpeakUp’ga qo‘shiling va shaxsiy ingliz tili sayohatingizni boshlang.",
+    "ctaSubtitle": "SpeakUp’ni oching va shaxsiy ingliz tili yo‘lingizni bugun davom ettiring.",
+    "heroAppLabel": "Sizning o‘qish yo‘lingiz",
+    "heroAppTitle": "A1 dan erkin gapirishgacha",
+    "heroProgressLabel": "Umumiy progress",
+    "heroBadgeLessons": "Interaktiv darslar",
+    "heroBadgeSpeaking": "Gapirish amaliyoti",
+    "heroBadgeProgress": "Jonli progress",
+    "heroFloatingStreak": "Joriy seriya",
+    "heroFloatingWords": "O‘rganilgan so‘zlar",
+    "days": "kun",
+    "pathGrammar": "Grammar & Vocabulary",
+    "pathGrammarValue": "Tuzilgan darslar",
+    "pathSkills": "Reading & Listening",
+    "pathSkillsValue": "Haqiqiy tushunish",
+    "pathSpeaking": "Writing & Speaking",
+    "pathSpeakingValue": "Faol mashq",
+    "statLevelsShort": "Darajalar",
+    "statSkillsShort": "Ko‘nikmalar",
+    "statRangeShort": "Diapazon",
+    "stats": {
+      "lessons": "Darslar va mashq",
+      "levels": "CEFR darajalari",
+      "skills": "Asosiy ko‘nikmalar",
+      "path": "To‘liq yo‘l"
+    },
+    "howTitle": "SpeakUp qanday ishlaydi",
+    "howSubtitle": "Oddiy sikl: kunlik mashq haqiqiy ingliz tili ko‘nikmalariga aylanadi.",
+    "how": {
+      "choose": {
+        "title": "Darajani tanlang",
+        "description": "A1–C2 dan boshlang va bosqichingizga mos tuzilgan yo‘lni kuzating."
+      },
+      "practice": {
+        "title": "Barcha ko‘nikmalarni mashq qiling",
+        "description": "Grammatika, lug‘at, o‘qish, tinglash, yozish va gapirish — barchasi bir joyda."
+      },
+      "grow": {
+        "title": "O‘sib boring",
+        "description": "Seriyalar, yakunlangan darslar va progress keyingi qadamni ko‘rsatadi."
+      }
+    },
     "features": {
-      "grammar": { "title": "Grammar", "description": "Master English grammar." },
-      "vocabulary": { "title": "Vocabulary", "description": "Build a strong vocabulary." },
-      "reading": { "title": "Reading", "description": "Improve reading comprehension." },
-      "listening": { "title": "Listening", "description": "Train your listening skills." },
-      "writing": { "title": "Writing", "description": "Practice writing." },
-      "speaking": { "title": "Speaking", "description": "Build confidence in speaking." }
+      "grammar": { "title": "Grammar", "description": "Tushunarli izohlar, mashq va mavzu testlari." },
+      "vocabulary": { "title": "Vocabulary", "description": "So‘z ro‘yxatlari, kartochkalar va muntazam mashq." },
+      "reading": { "title": "Reading", "description": "Daraja bo‘yicha matnlar va tushunish savollari." },
+      "listening": { "title": "Listening", "description": "Transkript va tekshiruvli audio darslar." },
+      "writing": { "title": "Writing", "description": "Saqlanadigan yo‘naltirilgan yozuv mashqlari." },
+      "speaking": { "title": "Speaking", "description": "O‘zingizni yozib oling va gapirish ishonchini oshiring." }
     },
     "levels": {
       "A1": { "name": "Beginner", "description": "Start with basics: greetings, simple sentences, and everyday words." },
@@ -120,7 +161,8 @@
     },
     "settings": {
       "title": "Sozlamalar",
-      "subtitle": "Til, tema, bildirishnomalar va hisob."
+      "subtitle": "Til, tema, tovushlar va hisob.",
+      "languageHint": "Faqat interfeys tili — dars materiallari ingliz tilida qoladi."
     },
     "login": {
       "title": "Xush kelibsiz",
@@ -136,6 +178,10 @@
     "light": "Yorug‘",
     "dark": "Qorong‘u",
     "system": "Tizim"
+  },
+  "sound": {
+    "title": "Tovush effektlari",
+    "subtitle": "Test, yutuq va gapirish tovushlarini boshqaring."
   },
   "language": {
     "label": "Til",

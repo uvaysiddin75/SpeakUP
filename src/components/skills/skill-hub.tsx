@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { Search } from "lucide-react";
+import { useUxOptional } from "@/components/providers/ux-provider";
+import { LevelCompleteModal } from "@/components/ui/level-complete-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,9 +36,44 @@ type SkillHubProps = {
 };
 
 export function SkillHub({ title, subtitle, items, accent }: SkillHubProps) {
+  const ux = useUxOptional();
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState<(typeof LEVELS)[number]>("ALL");
   const [onlyIncomplete, setOnlyIncomplete] = useState(false);
+  const [levelComplete, setLevelComplete] = useState<string | null>(null);
+  const [celebratedLevels, setCelebratedLevels] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [celebrationReady, setCelebrationReady] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem("speakup_celebrated_levels_v1");
+      if (raw) {
+        setCelebratedLevels(new Set(JSON.parse(raw) as string[]));
+      } else {
+        // First run: seed already-complete levels silently (no celebration spam).
+        const complete = Array.from(
+          new Set(
+            [...new Set(items.map((i) => i.levelCode))].filter((code) => {
+              const list = items.filter((i) => i.levelCode === code);
+              return list.length > 0 && list.every((i) => i.completed);
+            }),
+          ),
+        );
+        setCelebratedLevels(new Set(complete));
+        window.localStorage.setItem(
+          "speakup_celebrated_levels_v1",
+          JSON.stringify(complete),
+        );
+      }
+    } catch {
+      // ignore
+    }
+    setCelebrationReady(true);
+    // only seed on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -58,8 +95,48 @@ export function SkillHub({ title, subtitle, items, accent }: SkillHubProps) {
           (items.filter((i) => i.completed).length / items.length) * 1000,
         ) / 10;
 
+  useEffect(() => {
+    if (!celebrationReady) return;
+    const byLevel = new Map<string, SkillHubItem[]>();
+    for (const item of items) {
+      const list = byLevel.get(item.levelCode) ?? [];
+      list.push(item);
+      byLevel.set(item.levelCode, list);
+    }
+    for (const [code, list] of byLevel) {
+      if (list.length === 0) continue;
+      if (!list.every((item) => item.completed)) continue;
+      if (celebratedLevels.has(code)) continue;
+      const next = new Set(celebratedLevels).add(code);
+      setCelebratedLevels(next);
+      try {
+        window.localStorage.setItem(
+          "speakup_celebrated_levels_v1",
+          JSON.stringify([...next]),
+        );
+      } catch {
+        // ignore
+      }
+      setLevelComplete(code);
+      ux?.play("level-complete");
+      ux?.celebrate({ intensity: "strong" });
+      ux?.toast({
+        title: `🏆 ${code} Completed`,
+        description: "Achievement unlocked!",
+        tone: "achievement",
+        icon: "achievement",
+      });
+      break;
+    }
+  }, [items, celebratedLevels, ux, celebrationReady]);
+
   return (
     <div className="space-y-6">
+      <LevelCompleteModal
+        open={!!levelComplete}
+        onClose={() => setLevelComplete(null)}
+        levelCode={levelComplete ?? ""}
+      />
       <div
         className="overflow-hidden rounded-3xl border border-border p-6 sm:p-8"
         style={{
@@ -129,11 +206,18 @@ export function SkillHub({ title, subtitle, items, accent }: SkillHubProps) {
         {filtered.map((item) => (
           <Card
             key={item.id}
-            className={cn(item.locked && "opacity-60", item.completed && "ring-1 ring-success/40")}
+            interactive
+            className={cn(
+              "transition-all duration-200 hover:-translate-y-1",
+              item.locked && "opacity-60",
+              item.completed && "ring-1 ring-success/40",
+            )}
           >
             <CardHeader>
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="primary">{item.levelCode}</Badge>
+                <Badge variant="primary" className="card-icon">
+                  {item.levelCode}
+                </Badge>
                 <Badge>{item.difficulty}</Badge>
                 {item.completed ? <Badge variant="success">Completed</Badge> : null}
                 {item.locked ? <Badge variant="warning">Locked</Badge> : null}

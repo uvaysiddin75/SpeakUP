@@ -194,6 +194,24 @@ export async function gradeQuizAttempt(payload: GradePayload) {
     },
   });
 
+  const { applyQuizAttemptToProgress } = await import("@/services/progress-service");
+  await applyQuizAttemptToProgress({
+    userId: payload.userId,
+    quizId: quiz.id,
+    percentage,
+    passed,
+    title: quiz.title,
+    timeSpentSec: payload.timeSpentSec,
+    subtopicId: quiz.subtopicId,
+    topicId: quiz.topicId,
+    categoryId: quiz.categoryId,
+    levelId: quiz.levelId,
+    vocabularyTopicId: quiz.vocabularyTopicId,
+    readingTextId: quiz.readingTextId,
+    listeningTaskId: quiz.listeningTaskId,
+    speakingTaskId: quiz.speakingTaskId,
+  });
+
   return {
     attemptId: attempt.id,
     score: correctAnswers,

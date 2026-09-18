@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Mic, Square, Play, RotateCcw, Trash2 } from "lucide-react";
+import { Mic, Square, Play, RotateCcw, Trash2, Check } from "lucide-react";
+import { useUxOptional } from "@/components/providers/ux-provider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -16,11 +17,13 @@ export function SpeakingRecorder({
   onRecordingReady,
   className,
 }: SpeakingRecorderProps) {
+  const ux = useUxOptional();
   const [supported, setSupported] = useState(true);
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [recording, setRecording] = useState(false);
   const [duration, setDuration] = useState(0);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [justFinished, setJustFinished] = useState(false);
   const [levels, setLevels] = useState<number[]>(() => Array(24).fill(4));
 
   const mediaRecorder = useRef<MediaRecorder | null>(null);
@@ -31,6 +34,7 @@ export function SpeakingRecorder({
   const rafRef = useRef<number | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const audioUrlRef = useRef<string | null>(null);
+  const durationRef = useRef(0);
 
   const stopTracks = () => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -45,7 +49,6 @@ export function SpeakingRecorder({
     const ok =
       typeof MediaRecorder !== "undefined" &&
       !!navigator.mediaDevices?.getUserMedia;
-    // Defer to avoid synchronous setState-in-effect lint on mount probe.
     queueMicrotask(() => setSupported(ok));
     return () => {
       stopTracks();
@@ -56,6 +59,10 @@ export function SpeakingRecorder({
   useEffect(() => {
     audioUrlRef.current = audioUrl;
   }, [audioUrl]);
+
+  useEffect(() => {
+    durationRef.current = duration;
+  }, [duration]);
 
   const startWaveform = (stream: MediaStream) => {
     const ctx = new AudioContext();
@@ -81,6 +88,7 @@ export function SpeakingRecorder({
 
   const startRecording = async () => {
     setPermissionError(null);
+    setJustFinished(false);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -95,12 +103,22 @@ export function SpeakingRecorder({
         if (audioUrl) URL.revokeObjectURL(audioUrl);
         const url = URL.createObjectURL(blob);
         setAudioUrl(url);
-        onRecordingReady?.(blob, duration);
+        onRecordingReady?.(blob, durationRef.current);
+        setJustFinished(true);
+        ux?.play("recording-stop");
+        ux?.toast({
+          title: "Recording Complete ✓",
+          description: formatTime(durationRef.current),
+          tone: "success",
+          icon: "success",
+          durationMs: 2200,
+        });
         stopTracks();
       };
       recorder.start();
       setRecording(true);
       setDuration(0);
+      ux?.play("recording-start");
       startWaveform(stream);
       timerRef.current = setInterval(() => {
         setDuration((d) => {
@@ -132,6 +150,7 @@ export function SpeakingRecorder({
     if (audioUrl) URL.revokeObjectURL(audioUrl);
     setAudioUrl(null);
     setDuration(0);
+    setJustFinished(false);
     setLevels(Array(24).fill(4));
     onRecordingReady?.(null, 0);
   };
@@ -140,7 +159,7 @@ export function SpeakingRecorder({
     return (
       <div
         className={cn(
-          "rounded-2xl border border-danger/30 bg-danger/10 p-5 text-sm text-danger",
+          "rounded-2xl border border-danger/30 bg-danger/10 p-5 text-sm text-danger animate-shake",
           className,
         )}
       >
@@ -160,7 +179,33 @@ export function SpeakingRecorder({
         className,
       )}
     >
-      <div className="flex h-12 items-end justify-center gap-1">
+      <div className="mb-2 flex items-center justify-center gap-2">
+        <span
+          className={cn(
+            "flex h-10 w-10 items-center justify-center rounded-full text-lg",
+            recording
+              ? "bg-danger/15 text-danger animate-recording"
+              : "bg-primary/10 text-primary",
+          )}
+          aria-hidden
+        >
+          🎤
+        </span>
+        <div className="text-center">
+          <p className="text-sm font-semibold">
+            {recording
+              ? "Recording"
+              : justFinished
+                ? "Recording Complete ✓"
+                : "Ready to record"}
+          </p>
+          <p className="font-display text-2xl font-semibold tabular-nums">
+            {formatTime(duration)}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex h-12 items-end justify-center gap-1" aria-hidden>
         {levels.map((h, i) => (
           <span
             key={i}
@@ -172,9 +217,7 @@ export function SpeakingRecorder({
           />
         ))}
       </div>
-      <p className="mt-3 text-center font-display text-2xl font-semibold tabular-nums">
-        {formatTime(duration)}
-      </p>
+
       <div className="mt-4 flex flex-wrap justify-center gap-2">
         {!recording ? (
           <Button type="button" onClick={startRecording}>
@@ -216,6 +259,13 @@ export function SpeakingRecorder({
           </>
         ) : null}
       </div>
+
+      {justFinished ? (
+        <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-sm font-medium text-success animate-fade-up">
+          <Check className="h-4 w-4" />
+          Recording saved — you can play it back or continue.
+        </p>
+      ) : null}
     </div>
   );
 }
